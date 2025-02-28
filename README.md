@@ -1,0 +1,1 @@
+﻿This project aims to create a classic building game. The name is TBD.
