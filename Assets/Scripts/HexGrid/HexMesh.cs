@@ -15,6 +15,7 @@ namespace HexGrid
             Initialize();
             GenerateHexMesh();
             ApplyMesh();
+            AddMeshCollider();
         }
 
         private void Initialize()
@@ -66,6 +67,25 @@ namespace HexGrid
 
             _hexMesh.RecalculateNormals();
             _hexMesh.RecalculateBounds();
+        }
+
+        private void AddMeshCollider()
+        {
+            var meshCollider = GetComponent<MeshCollider>();
+            if (meshCollider == null)
+            {
+                meshCollider = gameObject.AddComponent<MeshCollider>();
+            }
+            meshCollider.sharedMesh = _hexMesh; 
+        }
+        
+        public void ChangeColor(Color newColor)
+        {
+            var meshRenderer = GetComponent<MeshRenderer>();
+            if (meshRenderer != null)
+            {
+                meshRenderer.material.color = newColor;
+            }
         }
     }
 }
