@@ -13,6 +13,7 @@ namespace HexGrid
         private void Awake()
         {
             _hexGrid = this.AddComponent<HexGrid>();
+            _hexGrid.spacing = 1;
             
             GenerateRoundHexGrid();
         }
