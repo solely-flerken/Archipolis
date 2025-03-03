@@ -76,5 +76,43 @@ namespace HexGrid
 
             return neighbors;
         }
+        
+        public (int q, int r, int s) WorldToHex(Vector3 position)
+        {
+            // Convert world position to local space (if grid is not at origin)
+            var localPosition = position - transform.position;
+
+            // Compute axial coordinates
+            var rFloat = localPosition.z / (HexConstants.OuterRadius * 1.5f + spacing);
+            var qFloat = localPosition.x / (HexConstants.InnerRadius * 2f + spacing) - rFloat * 0.5f;
+
+            // Convert to cube coordinates (q, r, s)
+            var sFloat = -qFloat - rFloat;
+
+            // Perform cube rounding
+            var q = Mathf.RoundToInt(qFloat);
+            var r = Mathf.RoundToInt(rFloat);
+            var s = Mathf.RoundToInt(sFloat);
+
+            // Fix rounding errors
+            var qDiff = Mathf.Abs(q - qFloat);
+            var rDiff = Mathf.Abs(r - rFloat);
+            var sDiff = Mathf.Abs(s - sFloat);
+
+            if (qDiff > rDiff && qDiff > sDiff)
+            {
+                q = -r - s;
+            }
+            else if (rDiff > sDiff)
+            {
+                r = -q - s;
+            }
+            else
+            {
+                s = -q - r;
+            }
+
+            return (q, r, s);
+        }
     }
 }
