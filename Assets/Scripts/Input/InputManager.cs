@@ -1,8 +1,10 @@
 ﻿using System;
+using Building;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Utils;
 
-namespace Manager
+namespace Input
 {
     public class InputManager : MonoBehaviour, InputActions.IGeneralActions
     {
@@ -11,7 +13,10 @@ namespace Manager
         private InputActions _inputMap;
         private InputActions.GeneralActions _general;
 
+        public Vector2 MousePosition { get; private set; }
+
         public event Action OnClick;
+        public event Action<GameObject> OnClickableClick;
 
         private void Awake()
         {
@@ -41,13 +46,27 @@ namespace Manager
             _general.Disable();
         }
 
+        public void OnMousePosition(InputAction.CallbackContext context)
+        {
+            MousePosition = context.ReadValue<Vector2>();
+        }
+
         void InputActions.IGeneralActions.OnClick(InputAction.CallbackContext context)
         {
-            if (context.performed)
-            {
-                Debug.Log($"OnClick: {context.phase}");
-                OnClick?.Invoke();
-            }
+            if (!context.performed) return;
+            
+            OnClick?.Invoke();
+
+            var clickableGameObject = MouseUtils.GetObjectUnderMouse(Camera.main);
+                
+            if (!clickableGameObject) return;
+            if (!clickableGameObject.TryGetComponent<IClickable>(out var component)) return;
+
+            component.OnClick(clickableGameObject);
+            
+            // Worse performance since every component listening to OnClickableClick does checks.
+            // Only use for UI etc.
+            OnClickableClick?.Invoke(clickableGameObject);
         }
     }
 }
