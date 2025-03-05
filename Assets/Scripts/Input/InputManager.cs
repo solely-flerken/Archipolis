@@ -46,6 +46,13 @@ namespace Input
             MousePosition = context.ReadValue<Vector2>();
         }
 
+        public void OnR(InputAction.CallbackContext context)
+        {
+            if (!context.performed) return;
+
+            EventSystem.Instance.InvokeKeyR();
+        }
+
         void InputActions.IGeneralActions.OnClick(InputAction.CallbackContext context)
         {
             if (!context.performed) return;

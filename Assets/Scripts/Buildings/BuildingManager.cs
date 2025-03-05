@@ -12,6 +12,7 @@ namespace Buildings
         private void Start()
         {
             EventSystem.Instance.OnClickableClick += HandleBuildingClick;
+            EventSystem.Instance.OnKeyR += HandleBuildingRotate;
         }
 
         private void Update()
@@ -31,6 +32,17 @@ namespace Buildings
         private void OnDestroy()
         {
             EventSystem.Instance.OnClickableClick -= HandleBuildingClick;
+            EventSystem.Instance.OnKeyR -= HandleBuildingRotate;
+        }
+
+        private void HandleBuildingRotate(GameObject obj)
+        {
+            if (_selectedBuilding is null) return;
+
+            if (_selectedBuilding.TryGetComponent<Building>(out var building))
+            {
+                building.RotateBuilding();
+            }
         }
 
         private void HandleBuildingClick(GameObject obj)

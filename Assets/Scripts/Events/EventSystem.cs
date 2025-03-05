@@ -27,6 +27,7 @@ namespace Events
         public event Action<GameObject> OnClickableClick;
         public event Action<GameObject> OnBuildingSelected;
         public event Action<GameObject> OnBuildingPlaced;
+        public event Action<GameObject> OnKeyR;
 
         public void InvokeClick()
         {
@@ -62,6 +63,11 @@ namespace Events
         public void InvokeBuildingPlaced(GameObject obj)
         {
             OnBuildingPlaced?.Invoke(obj);
+        }
+
+        public void InvokeKeyR()
+        {
+            OnKeyR?.Invoke(null);
         }
     }
 }
