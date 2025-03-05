@@ -18,8 +18,8 @@ namespace Buildings
             var worldPosition = MouseUtils.MouseToWorldPosition(Camera.main);
             if (!worldPosition.HasValue) return;
 
-            var hexCoordinates = _hexGrid.WorldToHex(worldPosition.Value);
-            var cell = _hexGrid.GetCell(hexCoordinates.q, hexCoordinates.r);
+            var hexCoordinate = _hexGrid.WorldToHex(worldPosition.Value);
+            var cell = _hexGrid.GetCell(hexCoordinate);
             if (!cell) return;
 
             var mesh = cell.GetComponent<HexMesh>();

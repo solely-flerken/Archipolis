@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using Quaternion = System.Numerics.Quaternion;
 
 namespace HexGrid
 {
@@ -18,9 +17,9 @@ namespace HexGrid
             (-1, 0), (0, -1), (1, -1)
         };
 
-        public HexCell GetCell(int q, int r)
+        public HexCell GetCell(HexCoordinate coordinate)
         {
-            return hexCells.Find(cell => cell.HexCoordinate.Q == q && cell.HexCoordinate.R == r);
+            return hexCells.Find(cell => cell.HexCoordinate.Q == coordinate.Q && cell.HexCoordinate.R == coordinate.R);
         }
 
         public void CreateCell(int q, int r)
@@ -76,8 +75,8 @@ namespace HexGrid
 
             return neighbors;
         }
-        
-        public (int q, int r, int s) WorldToHex(Vector3 position)
+
+        public HexCoordinate WorldToHex(Vector3 position)
         {
             // Convert world position to local space (if grid is not at origin)
             var localPosition = position - transform.position;
@@ -112,9 +111,9 @@ namespace HexGrid
                 s = -q - r;
             }
 
-            return (q, r, s);
+            return new HexCoordinate(q, r);
         }
-        
+
         public HexCell GetNearestHexCell(Vector3 worldPosition)
         {
             var closestDistance = Mathf.Infinity;
@@ -127,13 +126,12 @@ namespace HexGrid
                 var distance = Vector3.Distance(worldPosition, hexWorldPos);
 
                 if (distance >= closestDistance) continue;
-                
+
                 closestDistance = distance;
                 closestCell = hexCell;
             }
 
             return closestCell;
         }
-
     }
 }

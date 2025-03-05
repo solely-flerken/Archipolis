@@ -486,6 +486,10 @@ PrefabInstance:
       propertyPath: initialYaw
       value: 30
       objectReference: {fileID: 0}
+    - target: {fileID: 7143341417764125796, guid: 396805b42abddec4c90508ac570a486e, type: 3}
+      propertyPath: footprint.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
