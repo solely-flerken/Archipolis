@@ -114,5 +114,28 @@ namespace HexGrid
 
             return (q, r, s);
         }
+        
+        public HexCell GetNearestHexCell(Vector3 worldPosition)
+        {
+            var (q, r, s) = WorldToHex(worldPosition);
+    
+            var closestDistance = Mathf.Infinity;
+            HexCell closestCell = null;
+
+            // Iterate over all hex cells and find the one with the minimum distance
+            foreach (var hexCell in hexCells)
+            {
+                var hexWorldPos = hexCell.transform.position;
+                var distance = Vector3.Distance(worldPosition, hexWorldPos);
+
+                if (distance >= closestDistance) continue;
+                
+                closestDistance = distance;
+                closestCell = hexCell;
+            }
+
+            return closestCell;
+        }
+
     }
 }
