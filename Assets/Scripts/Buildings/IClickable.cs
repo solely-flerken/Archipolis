@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 
-namespace Building
+namespace Buildings
 {
     public interface IClickable
     {
-        void OnClick(GameObject gameObject);
+        void OnClick(GameObject obj);
     }
 }

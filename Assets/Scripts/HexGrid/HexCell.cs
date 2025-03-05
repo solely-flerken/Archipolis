@@ -1,4 +1,4 @@
-﻿using Building;
+﻿using Buildings;
 using UnityEngine;
 
 namespace HexGrid
@@ -14,9 +14,9 @@ namespace HexGrid
             UnityEditor.Handles.Label(transform.position, $"({Q}, {R}, {S})");
         }
 
-        public void OnClick(GameObject go)
+        public void OnClick(GameObject obj)
         {
-            Debug.Log("CLICKED THIS");
+            Debug.Log($"HexCell ({Q}, {R}, {S})");
         }
     }
 }

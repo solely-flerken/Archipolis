@@ -1,8 +1,6 @@
-﻿using System;
-using Building;
+﻿using Events;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Utils;
 
 namespace Input
 {
@@ -14,9 +12,6 @@ namespace Input
         private InputActions.GeneralActions _general;
 
         public Vector2 MousePosition { get; private set; }
-
-        public event Action OnClick;
-        public event Action<GameObject> OnClickableClick;
 
         private void Awake()
         {
@@ -55,18 +50,7 @@ namespace Input
         {
             if (!context.performed) return;
             
-            OnClick?.Invoke();
-
-            var clickableGameObject = MouseUtils.GetObjectUnderMouse(Camera.main);
-                
-            if (!clickableGameObject) return;
-            if (!clickableGameObject.TryGetComponent<IClickable>(out var component)) return;
-
-            component.OnClick(clickableGameObject);
-            
-            // Worse performance since every component listening to OnClickableClick does checks.
-            // Only use for UI etc.
-            OnClickableClick?.Invoke(clickableGameObject);
+            EventSystem.Instance.InvokeClick();
         }
     }
 }

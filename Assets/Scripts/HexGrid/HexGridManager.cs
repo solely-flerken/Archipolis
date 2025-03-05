@@ -3,16 +3,17 @@ using UnityEngine;
 
 namespace HexGrid
 {
-    public class HexGridGenerator : MonoBehaviour
+    public class HexGridManager : MonoBehaviour
     {
         public int radius = 3;
+        public int spacing = 1;
         
-        private HexGrid _hexGrid;
+        public static HexGrid HexGrid;
 
         private void Awake()
         {
-            _hexGrid = this.AddComponent<HexGrid>();
-            _hexGrid.spacing = 1;
+            HexGrid = this.AddComponent<HexGrid>();
+            HexGrid.spacing = spacing;
             
             GenerateRoundHexGrid();
         }
@@ -26,7 +27,7 @@ namespace HexGrid
                     var s = -q - r;
                     if (Mathf.Abs(s) <= radius)
                     {
-                        _hexGrid.CreateCell(q, r);
+                        HexGrid.CreateCell(q, r);
                     }
                 }
             }

@@ -82,7 +82,7 @@ namespace HexGrid
         public void ChangeColor(Color newColor)
         {
             var meshRenderer = GetComponent<MeshRenderer>();
-            if (meshRenderer != null)
+            if (meshRenderer)
             {
                 meshRenderer.material.color = newColor;
             }
