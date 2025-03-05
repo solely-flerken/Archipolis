@@ -8,12 +8,27 @@ namespace Buildings
 {
     public class BuildingManager : MonoBehaviour
     {
+        public static BuildingManager Instance { get; private set; }
+        
         private GameObject _selectedBuilding;
 
         private static readonly Color BaseOverlay = new(0, 0, 0, 0.0f);
         private static readonly Color InvalidOverlay = new(1, 0, 0, 1f);
         private static readonly Color ValidOverlay = new(0, 1, 0, 1f);
-
+        
+        private void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
+        
         private void Start()
         {
             EventSystem.Instance.OnClickableClick += HandleBuildingClick;
@@ -30,7 +45,7 @@ namespace Buildings
 
             mousePosition.y = 0;
 
-            var cell = HexGridManager.HexGrid.GetNearestHexCell(mousePosition);
+            var cell = HexGridManager.Instance.HexGrid.GetNearestHexCell(mousePosition);
             _selectedBuilding.transform.position = cell.transform.position;
 
             // Check placement validity
@@ -46,7 +61,7 @@ namespace Buildings
                 new HexCoordinate(currentHexCoordinate.Q + offset.Q, currentHexCoordinate.R + offset.R)).ToList();
 
             var isInvalidPlacement = adjacentHexCoordinates
-                .Select(adjacentHex => HexGridManager.HexGrid.GetCell(adjacentHex))
+                .Select(adjacentHex => HexGridManager.Instance.HexGrid.GetCell(adjacentHex))
                 .Any(adjacentCell => adjacentCell is null || adjacentCell.Occupied);
 
             ColorBasedOnValidity(isInvalidPlacement, building);

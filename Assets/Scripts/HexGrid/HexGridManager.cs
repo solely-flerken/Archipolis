@@ -5,13 +5,25 @@ namespace HexGrid
 {
     public class HexGridManager : MonoBehaviour
     {
+        public static HexGridManager Instance { get; private set; }
+
         public int radius = 3;
         public int spacing = 1;
         
-        public static HexGrid HexGrid;
+        public HexGrid HexGrid;
 
         private void Awake()
         {
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+            
             HexGrid = this.AddComponent<HexGrid>();
             HexGrid.spacing = spacing;
             
