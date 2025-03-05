@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using Quaternion = System.Numerics.Quaternion;
 
 namespace HexGrid
 {
@@ -19,7 +20,7 @@ namespace HexGrid
 
         public HexCell GetCell(int q, int r)
         {
-            return hexCells.Find(cell => cell.Q == q && cell.R == r);
+            return hexCells.Find(cell => cell.HexCoordinate.Q == q && cell.HexCoordinate.R == r);
         }
 
         public void CreateCell(int q, int r)
@@ -35,15 +36,14 @@ namespace HexGrid
             cell.transform.localPosition = position;
 
             // Grid coordinates
-            cell.Q = q;
-            cell.R = r;
+            cell.HexCoordinate = new HexCoordinate(q, r);
 
             hexCells.Add(cell);
         }
 
         public void RemoveCell(int q, int r)
         {
-            var cellToRemove = hexCells.Find(cell => cell.Q == q && cell.R == r);
+            var cellToRemove = hexCells.Find(cell => cell.HexCoordinate.Q == q && cell.HexCoordinate.R == r);
 
             if (cellToRemove != null)
             {
@@ -62,11 +62,11 @@ namespace HexGrid
 
             foreach (var (dq, dr) in NeighborOffsets)
             {
-                var neighborQ = cell.Q + dq;
-                var neighborR = cell.R + dr;
+                var neighborQ = cell.HexCoordinate.Q + dq;
+                var neighborR = cell.HexCoordinate.R + dr;
 
                 // Find the neighboring cell
-                var neighbor = hexCells.Find(c => c.Q == neighborQ && c.R == neighborR);
+                var neighbor = hexCells.Find(c => c.HexCoordinate.Q == neighborQ && c.HexCoordinate.R == neighborR);
 
                 if (neighbor != null)
                 {
@@ -117,8 +117,6 @@ namespace HexGrid
         
         public HexCell GetNearestHexCell(Vector3 worldPosition)
         {
-            var (q, r, s) = WorldToHex(worldPosition);
-    
             var closestDistance = Mathf.Infinity;
             HexCell closestCell = null;
 
