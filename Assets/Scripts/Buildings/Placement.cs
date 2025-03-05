@@ -6,20 +6,13 @@ namespace Buildings
 {
     public class Placement : MonoBehaviour
     {
-        private HexGrid.HexGrid _hexGrid;
-
-        private void Start()
-        {
-            _hexGrid = HexGridManager.HexGrid;
-        }
-
         private void Update()
         {
             var worldPosition = MouseUtils.MouseToWorldPosition(Camera.main);
             if (!worldPosition.HasValue) return;
 
-            var hexCoordinate = _hexGrid.WorldToHex(worldPosition.Value);
-            var cell = _hexGrid.GetCell(hexCoordinate);
+            var hexCoordinate = HexGridManager.Instance.HexGrid.WorldToHex(worldPosition.Value);
+            var cell = HexGridManager.Instance.HexGrid.GetCell(hexCoordinate);
             if (!cell) return;
 
             var mesh = cell.GetComponent<HexMesh>();
