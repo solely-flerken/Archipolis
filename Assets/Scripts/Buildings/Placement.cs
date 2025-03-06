@@ -1,22 +1,30 @@
-﻿using HexGrid;
+﻿using Events;
+using HexGrid;
 using UnityEngine;
-using Utils;
 
 namespace Buildings
 {
     public class Placement : MonoBehaviour
     {
-        private void Update()
+        private void Start()
         {
-            var worldPosition = MouseUtils.MouseToWorldPosition(Camera.main);
-            if (!worldPosition.HasValue) return;
+            EventSystem.Instance.OnBuildingPlaced += CheckHexGrid;
+        }
 
-            var hexCoordinate = HexGridManager.Instance.HexGrid.WorldToHex(worldPosition.Value);
-            var cell = HexGridManager.Instance.HexGrid.GetCell(hexCoordinate);
-            if (!cell) return;
+        public void OnDestroy()
+        {
+            EventSystem.Instance.OnBuildingPlaced -= CheckHexGrid;
+        }
+        
+        private static void CheckHexGrid(GameObject obj)
+        {
+            var cells = HexGridManager.Instance.HexGrid.hexCells;
 
-            var mesh = cell.GetComponent<HexMesh>();
-            mesh.ChangeColor(new Color(0.2f, 0.8f, 0.4f));
+            foreach (var cell in cells)
+            {
+                if(!cell.TryGetComponent<HexMesh>(out var mesh)) continue;
+                mesh.ChangeColor(cell.Occupied ? new Color(0.8f, 0.3f, 0.5f) : new Color(0f, 0f, 0f, 0f));
+            }
         }
     }
 }
