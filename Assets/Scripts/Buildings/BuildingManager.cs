@@ -31,7 +31,6 @@ namespace Buildings
         private void Start()
         {
             EventSystem.Instance.OnBuildingClick += HandleBuildingClick;
-            EventSystem.Instance.OnBuildingPlaced += HandleBuildingPlaced;
             EventSystem.Instance.OnKeyR += HandleBuildingRotate;
         }
 
@@ -60,31 +59,49 @@ namespace Buildings
         private void OnDestroy()
         {
             EventSystem.Instance.OnBuildingClick -= HandleBuildingClick;
-            EventSystem.Instance.OnBuildingPlaced -= HandleBuildingPlaced;
             EventSystem.Instance.OnKeyR -= HandleBuildingRotate;
         }
 
+        // TODO: Refactor this
         private void HandleBuildingClick(GameObject obj)
         {
             if (_selectedObject is not null)
             {
+                // Try place object. Only place the building if placement is valid
+                if (!_selectedObject.TryGetComponent<Building>(out var building)) return;
+                
+                if (!IsPlacementValid(building)) return;
+
+                var originCell = HexGridManager.Instance.HexGrid.GetNearestHexCell(building.transform.position);
+                if (originCell is null) return;
+                
+                var tissue = HexGridManager.Instance.HexGrid.GetTissue(originCell.HexCoordinate, building.Footprint);
+                foreach (var cell in tissue)
+                {
+                    cell.OccupiedBy = obj;
+                }
+            
+                _selectedObject = null;
+                
                 EventSystem.Instance.InvokeBuildingPlaced(_selectedObject);
             }
             else
             {
+                // Pick object up
                 _selectedObject = obj;
+                
+                if (!_selectedObject.TryGetComponent<Building>(out var building)) return;
+                
+                var originCell = HexGridManager.Instance.HexGrid.GetNearestHexCell(building.transform.position);
+                if (originCell is null) return;
+            
+                var tissue = HexGridManager.Instance.HexGrid.GetTissue(originCell.HexCoordinate, building.Footprint);
+                foreach (var cell in tissue)
+                {
+                    // TODO: We should only reset the occupancy when we have placed it. So we could cancel the placement
+                    cell.OccupiedBy = null;
+                }
             }
-        }
-
-        private void HandleBuildingPlaced(GameObject obj)
-        {
-            if (!_selectedObject.TryGetComponent<Building>(out var building)) return;
-
-
-            if (!IsPlacementValid(building)) return;
-
-            // Only place the building if placement is valid
-            _selectedObject = null;
         }
 
         private void HandleBuildingRotate(GameObject obj)

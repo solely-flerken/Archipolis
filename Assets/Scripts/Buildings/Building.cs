@@ -8,6 +8,8 @@ namespace Buildings
     {
         public int initialYaw;
         
+        // TODO: Use origin to cancel a placement to go back to it.
+        public HexCoordinate Origin; 
         /// <summary>
         /// Defines the footprint of the building.
         /// Footprint is build by calculating adjacent hex cells with the offsets.
