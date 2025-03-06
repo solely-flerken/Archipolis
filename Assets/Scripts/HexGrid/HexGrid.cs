@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Utils;
 
@@ -146,6 +147,14 @@ namespace HexGrid
             var cell = GetNearestHexCell(mousePosition);
 
             return cell;
+        }
+
+        public List<HexCell> GetTissue(HexCoordinate origin, HexCoordinate[] offsets)
+        {
+            var cellCoordinatesInTissue = offsets.Select(offset =>
+                new HexCoordinate(origin.Q + offset.Q, origin.R + offset.R)).ToList();
+
+            return cellCoordinatesInTissue.Select(GetCell).ToList();
         }
     }
 }
