@@ -25,7 +25,7 @@ namespace Events
         public event Action OnClick;
 
         public event Action<GameObject> OnClickableClick;
-        public event Action<GameObject> OnBuildingSelected;
+        public event Action<GameObject> OnBuildingClick;
         public event Action<GameObject> OnBuildingPlaced;
         public event Action<GameObject> OnKeyR;
 
@@ -36,18 +36,17 @@ namespace Events
             var objectUnderMouse = MouseUtils.GetObjectUnderMouse(Camera.main);
                 
             if (objectUnderMouse is null) return;
-            if (!objectUnderMouse.TryGetComponent<IClickable>(out var component)) return;
-
-            component.OnClick(objectUnderMouse);
             
+            // Check for IClickable component
+            if (!objectUnderMouse.TryGetComponent<IClickable>(out var component)) return;
+            component.OnClick(objectUnderMouse);
             // Worse performance since every component listening to OnClickableClick does checks.
             // Only use for UI etc.
             InvokeClickableClick(objectUnderMouse);
-
-            if (!objectUnderMouse.TryGetComponent<Building>(out _))
-            {
-                InvokeBuildingSelected(objectUnderMouse);
-            }
+            
+            // Check for Building component
+            if (!objectUnderMouse.TryGetComponent<Building>(out _)) return;
+            InvokeBuildingClick(objectUnderMouse);
         }
 
         private void InvokeClickableClick(GameObject obj)
@@ -55,9 +54,9 @@ namespace Events
             OnClickableClick?.Invoke(obj);
         }
 
-        private void InvokeBuildingSelected(GameObject obj)
+        private void InvokeBuildingClick(GameObject obj)
         {
-            OnBuildingSelected?.Invoke(obj);
+            OnBuildingClick?.Invoke(obj);
         }
 
         public void InvokeBuildingPlaced(GameObject obj)

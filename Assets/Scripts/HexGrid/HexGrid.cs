@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using Utils;
 
 namespace HexGrid
 {
@@ -132,6 +133,19 @@ namespace HexGrid
             }
 
             return closestCell;
+        }
+
+        public HexCell GetNearestHexCellToMousePosition()
+        {
+            var mouseToWorldPosition = MouseUtils.MouseToWorldPosition(Camera.main);
+
+            if (mouseToWorldPosition is not { } mousePosition) return null;
+
+            mousePosition.y = 0;
+
+            var cell = GetNearestHexCell(mousePosition);
+
+            return cell;
         }
     }
 }

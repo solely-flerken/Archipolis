@@ -2,20 +2,19 @@
 using Events;
 using HexGrid;
 using UnityEngine;
-using Utils;
 
 namespace Buildings
 {
     public class BuildingManager : MonoBehaviour
     {
         public static BuildingManager Instance { get; private set; }
-        
-        private GameObject _selectedBuilding;
+
+        private GameObject _selectedObject;
 
         private static readonly Color BaseOverlay = new(0, 0, 0, 0.0f);
         private static readonly Color InvalidOverlay = new(1, 0, 0, 1f);
         private static readonly Color ValidOverlay = new(0, 1, 0, 1f);
-        
+
         private void Awake()
         {
             if (Instance == null)
@@ -28,77 +27,96 @@ namespace Buildings
                 Destroy(gameObject);
             }
         }
-        
+
         private void Start()
         {
-            EventSystem.Instance.OnClickableClick += HandleBuildingClick;
+            EventSystem.Instance.OnBuildingClick += HandleBuildingClick;
+            EventSystem.Instance.OnBuildingPlaced += HandleBuildingPlaced;
             EventSystem.Instance.OnKeyR += HandleBuildingRotate;
         }
 
         private void Update()
         {
-            if (!_selectedBuilding) return;
+            if (!_selectedObject) return;
 
-            var mouseToWorldPosition = MouseUtils.MouseToWorldPosition(Camera.main);
+            var cell = HexGridManager.Instance.HexGrid.GetNearestHexCellToMousePosition();
+            if (cell is null) return;
 
-            if (mouseToWorldPosition is not { } mousePosition) return;
+            // Snap to grid
+            _selectedObject.transform.position = cell.transform.position;
 
-            mousePosition.y = 0;
-
-            var cell = HexGridManager.Instance.HexGrid.GetNearestHexCell(mousePosition);
-            _selectedBuilding.transform.position = cell.transform.position;
-
-            // Check placement validity
-            var currentHexCoordinate = cell.HexCoordinate;
-
-            if (!_selectedBuilding.TryGetComponent<Building>(out var building))
+            if (!_selectedObject.TryGetComponent<Building>(out var building))
             {
                 return;
             }
 
-            var footprint = building.Footprint;
-            var adjacentHexCoordinates = footprint.Select(offset =>
-                new HexCoordinate(currentHexCoordinate.Q + offset.Q, currentHexCoordinate.R + offset.R)).ToList();
+            // Check placement validity
+            var isValidPlacement = IsPlacementValid(building);
 
-            var isInvalidPlacement = adjacentHexCoordinates
-                .Select(adjacentHex => HexGridManager.Instance.HexGrid.GetCell(adjacentHex))
-                .Any(adjacentCell => adjacentCell is null || adjacentCell.Occupied);
-
-            ColorBasedOnValidity(isInvalidPlacement, building);
+            // Overlay color based on placement validity
+            ColorBasedOnValidity(isValidPlacement, building);
         }
 
         private void OnDestroy()
         {
-            EventSystem.Instance.OnClickableClick -= HandleBuildingClick;
+            EventSystem.Instance.OnBuildingClick -= HandleBuildingClick;
+            EventSystem.Instance.OnBuildingPlaced -= HandleBuildingPlaced;
             EventSystem.Instance.OnKeyR -= HandleBuildingRotate;
+        }
+
+        private void HandleBuildingClick(GameObject obj)
+        {
+            if (_selectedObject is not null)
+            {
+                EventSystem.Instance.InvokeBuildingPlaced(_selectedObject);
+            }
+            else
+            {
+                _selectedObject = obj;
+            }
+        }
+
+        private void HandleBuildingPlaced(GameObject obj)
+        {
+            if (!_selectedObject.TryGetComponent<Building>(out var building)) return;
+
+
+            if (!IsPlacementValid(building)) return;
+
+            // Only place the building if placement is valid
+            _selectedObject = null;
         }
 
         private void HandleBuildingRotate(GameObject obj)
         {
-            if (_selectedBuilding is null) return;
+            if (_selectedObject is null) return;
 
-            if (_selectedBuilding.TryGetComponent<Building>(out var building))
+            if (_selectedObject.TryGetComponent<Building>(out var building))
             {
                 building.RotateBuilding();
             }
         }
 
-        private void HandleBuildingClick(GameObject obj)
+        private static void ColorBasedOnValidity(bool isValid, Building building)
         {
-            if (_selectedBuilding is not null)
-            {
-                EventSystem.Instance.InvokeBuildingPlaced(_selectedBuilding);
-                _selectedBuilding = null;
-            }
-            else if (obj.TryGetComponent<Building>(out var newSelectedBuilding))
-            {
-                _selectedBuilding = newSelectedBuilding.gameObject;
-            }
+            building.SetColor(isValid ? BaseOverlay : InvalidOverlay);
         }
 
-        private static void ColorBasedOnValidity(bool isInvalid, Building building)
+        private static bool IsPlacementValid(Building building)
         {
-            building.SetColor(isInvalid ? InvalidOverlay : BaseOverlay);
+            var cell = HexGridManager.Instance.HexGrid.GetNearestHexCell(building.transform.position);
+            if (cell is null) return false;
+
+            var coordinate = cell.HexCoordinate;
+            var footprint = building.Footprint;
+            var adjacentHexCoordinates = footprint.Select(offset =>
+                new HexCoordinate(coordinate.Q + offset.Q, coordinate.R + offset.R)).ToList();
+
+            var isInvalidPlacement = adjacentHexCoordinates
+                .Select(adjacentHex => HexGridManager.Instance.HexGrid.GetCell(adjacentHex))
+                .Any(adjacentCell => adjacentCell is null || adjacentCell.Occupied);
+
+            return !isInvalidPlacement;
         }
     }
 }
