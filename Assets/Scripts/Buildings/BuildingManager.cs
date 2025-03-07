@@ -108,10 +108,10 @@ namespace Buildings
         {
             if (_selectedObject is null) return;
 
-            if (_selectedObject.TryGetComponent<Building>(out var building))
-            {
-                building.RotateBuilding();
-            }
+            if (!_selectedObject.TryGetComponent<Building>(out var building)) return;
+            
+            building.RotateBuilding();
+            building.RotateFootprint();
         }
 
         private static void ColorBasedOnValidity(bool isValid, Building building)

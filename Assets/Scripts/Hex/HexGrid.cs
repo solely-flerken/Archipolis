@@ -156,5 +156,26 @@ namespace Hex
 
             return cellCoordinatesInTissue.Select(GetCell).ToList();
         }
+        
+        public static HexCoordinate[] RotateHexesClockwise(HexCoordinate origin, HexCoordinate[] hexes)
+        {
+            var rotatedHexes = new HexCoordinate[hexes.Length];
+
+            for (var i = 0; i < hexes.Length; i++)
+            {
+                var q = hexes[i].Q - origin.Q;
+                var r = hexes[i].R - origin.R;
+                var s = -q - r;
+
+                // Apply clockwise hex rotation (60 degrees)
+                var newQ = -s;
+                var newR = -q;
+                var newS = -r; // Not needed directly but helps for clarity
+
+                rotatedHexes[i] = new HexCoordinate(newQ + origin.Q, newR + origin.R);
+            }
+
+            return rotatedHexes;
+        }
     }
 }
