@@ -1,4 +1,5 @@
-﻿using HexGrid;
+﻿using System.Collections.Generic;
+using Hex;
 using UnityEngine;
 
 namespace Buildings

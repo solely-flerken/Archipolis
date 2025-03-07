@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 using Utils;
 
-namespace HexGrid
+namespace Hex
 {
     public class HexGrid : MonoBehaviour
     {

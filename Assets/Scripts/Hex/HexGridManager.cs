@@ -1,7 +1,7 @@
 ﻿using Unity.VisualScripting;
 using UnityEngine;
 
-namespace HexGrid
+namespace Hex
 {
     public class HexGridManager : MonoBehaviour
     {
@@ -10,7 +10,7 @@ namespace HexGrid
         public int radius = 3;
         public int spacing = 1;
         
-        public HexGrid HexGrid;
+        public HexGrid hexGrid;
 
         private void Awake()
         {
@@ -24,8 +24,8 @@ namespace HexGrid
                 Destroy(gameObject);
             }
             
-            HexGrid = this.AddComponent<HexGrid>();
-            HexGrid.spacing = spacing;
+            hexGrid = this.AddComponent<HexGrid>();
+            hexGrid.spacing = spacing;
             
             GenerateRoundHexGrid();
         }
@@ -39,7 +39,7 @@ namespace HexGrid
                     var s = -q - r;
                     if (Mathf.Abs(s) <= radius)
                     {
-                        HexGrid.CreateCell(q, r);
+                        hexGrid.CreateCell(q, r);
                     }
                 }
             }

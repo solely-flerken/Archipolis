@@ -1,5 +1,6 @@
-﻿using Events;
-using HexGrid;
+﻿using System;
+using Events;
+using Hex;
 using UnityEngine;
 
 namespace Buildings

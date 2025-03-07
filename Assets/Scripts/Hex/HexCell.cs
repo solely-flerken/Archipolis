@@ -1,7 +1,7 @@
 ﻿using Buildings;
 using UnityEngine;
 
-namespace HexGrid
+namespace Hex
 {
     public class HexCell : MonoBehaviour, IClickable
     {

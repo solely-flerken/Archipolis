@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using Events;
-using HexGrid;
+using Hex;
 using UnityEngine;
 
 namespace Buildings
@@ -38,7 +38,7 @@ namespace Buildings
         {
             if (!_selectedObject) return;
 
-            var cell = HexGridManager.Instance.HexGrid.GetNearestHexCellToMousePosition();
+            var cell = HexGridManager.Instance.hexGrid.GetNearestHexCellToMousePosition();
             if (cell is null) return;
 
             // Snap to grid
@@ -72,10 +72,10 @@ namespace Buildings
                 
                 if (!IsPlacementValid(building)) return;
 
-                var originCell = HexGridManager.Instance.HexGrid.GetNearestHexCell(building.transform.position);
+                var originCell = HexGridManager.Instance.hexGrid.GetNearestHexCell(building.transform.position);
                 if (originCell is null) return;
                 
-                var tissue = HexGridManager.Instance.HexGrid.GetTissue(originCell.HexCoordinate, building.Footprint);
+                var tissue = HexGridManager.Instance.hexGrid.GetTissue(originCell.HexCoordinate, building.Footprint);
                 foreach (var cell in tissue)
                 {
                     cell.OccupiedBy = obj;
@@ -92,10 +92,10 @@ namespace Buildings
                 
                 if (!_selectedObject.TryGetComponent<Building>(out var building)) return;
                 
-                var originCell = HexGridManager.Instance.HexGrid.GetNearestHexCell(building.transform.position);
+                var originCell = HexGridManager.Instance.hexGrid.GetNearestHexCell(building.transform.position);
                 if (originCell is null) return;
             
-                var tissue = HexGridManager.Instance.HexGrid.GetTissue(originCell.HexCoordinate, building.Footprint);
+                var tissue = HexGridManager.Instance.hexGrid.GetTissue(originCell.HexCoordinate, building.Footprint);
                 foreach (var cell in tissue)
                 {
                     // TODO: We should only reset the occupancy when we have placed it. So we could cancel the placement
@@ -121,7 +121,7 @@ namespace Buildings
 
         private static bool IsPlacementValid(Building building)
         {
-            var cell = HexGridManager.Instance.HexGrid.GetNearestHexCell(building.transform.position);
+            var cell = HexGridManager.Instance.hexGrid.GetNearestHexCell(building.transform.position);
             if (cell is null) return false;
 
             var coordinate = cell.HexCoordinate;
@@ -130,7 +130,7 @@ namespace Buildings
                 new HexCoordinate(coordinate.Q + offset.Q, coordinate.R + offset.R)).ToList();
 
             var isInvalidPlacement = adjacentHexCoordinates
-                .Select(adjacentHex => HexGridManager.Instance.HexGrid.GetCell(adjacentHex))
+                .Select(adjacentHex => HexGridManager.Instance.hexGrid.GetCell(adjacentHex))
                 .Any(adjacentCell => adjacentCell is null || adjacentCell.Occupied);
 
             return !isInvalidPlacement;
