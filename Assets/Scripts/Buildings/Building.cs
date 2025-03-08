@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Hex;
+﻿using Hex;
 using UnityEngine;
 
 namespace Buildings
@@ -9,8 +8,8 @@ namespace Buildings
     {
         public int initialYaw;
 
-        // TODO: Use origin to cancel a placement to go back to it.
         public HexCoordinate Origin;
+        public HexCoordinate InitialPosition;
 
         /// <summary>
         /// Defines the footprint of the building.
@@ -30,6 +29,8 @@ namespace Buildings
             _propertyBlock = new MaterialPropertyBlock();
 
             transform.rotation = Quaternion.Euler(0, initialYaw, 0);
+
+            InitialPosition = Origin;
         }
 
         public void RotateBuilding()
@@ -40,7 +41,7 @@ namespace Buildings
 
         public void RotateFootprint()
         {
-            Footprint = HexGrid.RotateHexesClockwise(new HexCoordinate(0, 0), Footprint);
+            Footprint = HexGrid.RotateHexesClockwise(new HexCoordinate(0,0), Footprint);
         }
 
         public void SetColor(Color color)

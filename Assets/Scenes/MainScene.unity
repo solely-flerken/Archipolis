@@ -545,6 +545,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   radius: 3
   spacing: 1
+  hexGrid: {fileID: 0}
 --- !u!114 &2062088106
 MonoBehaviour:
   m_ObjectHideFlags: 0
