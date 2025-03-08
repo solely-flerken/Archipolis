@@ -53,6 +53,13 @@ namespace Input
             EventSystem.Instance.InvokeKeyR();
         }
 
+        public void OnCancel(InputAction.CallbackContext context)
+        {
+            if (!context.performed) return;
+            
+            EventSystem.Instance.InvokeCancel();
+        }
+
         void InputActions.IGeneralActions.OnClick(InputAction.CallbackContext context)
         {
             if (!context.performed) return;
