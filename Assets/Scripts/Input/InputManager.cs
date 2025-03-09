@@ -12,7 +12,7 @@ namespace Input
         private InputActions.GeneralActions _general;
 
         public Vector2 MousePosition { get; private set; }
-
+        
         private void Awake()
         {
             if (Instance == null)
@@ -60,10 +60,34 @@ namespace Input
             EventSystem.Instance.InvokeCancel();
         }
 
-        void InputActions.IGeneralActions.OnClick(InputAction.CallbackContext context)
+        public void OnClickRight(InputAction.CallbackContext context)
+        {
+            if (context.started)
+            {
+                EventSystem.Instance.InvokeClickRight();
+            }
+            else if (context.performed)
+            {
+                EventSystem.Instance.InvokeClickRightHold(true);
+            }
+            else if(context.canceled)
+            {
+                EventSystem.Instance.InvokeClickRightHold(false);
+            }
+        }
+
+        public void OnMouseScroll(InputAction.CallbackContext context)
         {
             if (!context.performed) return;
             
+            var scroll = context.ReadValue<Vector2>();
+            // MouseScrollDelta is stored in a Vector2.y property. (The Vector2.x value is ignored.)
+            EventSystem.Instance.InvokeMouseScroll(scroll.y);
+        }
+
+        void InputActions.IGeneralActions.OnClick(InputAction.CallbackContext context)
+        {
+            if (!context.performed) return;
             EventSystem.Instance.InvokeClick();
         }
     }

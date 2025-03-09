@@ -126,6 +126,24 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ClickRight"",
+                    ""type"": ""Button"",
+                    ""id"": ""75b2f53a-aaee-453e-9ea6-bb64024f489d"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": ""Hold(duration=0.1)"",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""MouseScroll"",
+                    ""type"": ""Value"",
+                    ""id"": ""cbf6dda3-15a4-4a71-93b9-a1b88808aa82"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -172,6 +190,28 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Cancel"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a27bcff6-02ae-4308-83ab-b471c06c5dff"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""ClickRight"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""85792287-3330-4966-bbc2-ddd0081782ba"",
+                    ""path"": ""<Mouse>/scroll"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MouseScroll"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -184,6 +224,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_General_MousePosition = m_General.FindAction("Mouse Position", throwIfNotFound: true);
         m_General_R = m_General.FindAction("R", throwIfNotFound: true);
         m_General_Cancel = m_General.FindAction("Cancel", throwIfNotFound: true);
+        m_General_ClickRight = m_General.FindAction("ClickRight", throwIfNotFound: true);
+        m_General_MouseScroll = m_General.FindAction("MouseScroll", throwIfNotFound: true);
     }
 
     ~@InputActions()
@@ -268,6 +310,8 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_General_MousePosition;
     private readonly InputAction m_General_R;
     private readonly InputAction m_General_Cancel;
+    private readonly InputAction m_General_ClickRight;
+    private readonly InputAction m_General_MouseScroll;
     /// <summary>
     /// Provides access to input actions defined in input action map "General".
     /// </summary>
@@ -295,6 +339,14 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "General/Cancel".
         /// </summary>
         public InputAction @Cancel => m_Wrapper.m_General_Cancel;
+        /// <summary>
+        /// Provides access to the underlying input action "General/ClickRight".
+        /// </summary>
+        public InputAction @ClickRight => m_Wrapper.m_General_ClickRight;
+        /// <summary>
+        /// Provides access to the underlying input action "General/MouseScroll".
+        /// </summary>
+        public InputAction @MouseScroll => m_Wrapper.m_General_MouseScroll;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -333,6 +385,12 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @Cancel.started += instance.OnCancel;
             @Cancel.performed += instance.OnCancel;
             @Cancel.canceled += instance.OnCancel;
+            @ClickRight.started += instance.OnClickRight;
+            @ClickRight.performed += instance.OnClickRight;
+            @ClickRight.canceled += instance.OnClickRight;
+            @MouseScroll.started += instance.OnMouseScroll;
+            @MouseScroll.performed += instance.OnMouseScroll;
+            @MouseScroll.canceled += instance.OnMouseScroll;
         }
 
         /// <summary>
@@ -356,6 +414,12 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @Cancel.started -= instance.OnCancel;
             @Cancel.performed -= instance.OnCancel;
             @Cancel.canceled -= instance.OnCancel;
+            @ClickRight.started -= instance.OnClickRight;
+            @ClickRight.performed -= instance.OnClickRight;
+            @ClickRight.canceled -= instance.OnClickRight;
+            @MouseScroll.started -= instance.OnMouseScroll;
+            @MouseScroll.performed -= instance.OnMouseScroll;
+            @MouseScroll.canceled -= instance.OnMouseScroll;
         }
 
         /// <summary>
@@ -424,5 +488,19 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnCancel(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "ClickRight" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnClickRight(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "MouseScroll" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnMouseScroll(InputAction.CallbackContext context);
     }
 }

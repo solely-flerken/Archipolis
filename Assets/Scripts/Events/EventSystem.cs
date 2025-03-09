@@ -23,6 +23,9 @@ namespace Events
         }
 
         public event Action OnClick;
+        public event Action OnClickRight;
+        public event Action<bool> OnClickRightHold;
+        public event Action<float> OnMouseScroll;
         public event Action<GameObject> OnClickableClick;
         public event Action<GameObject> OnBuildingClick;
         public event Action<GameObject> OnBuildingPlaced;
@@ -72,6 +75,21 @@ namespace Events
         public void InvokeCancel()
         {
             OnCancel?.Invoke();
+        }
+
+        public void InvokeClickRight()
+        {
+            OnClickRight?.Invoke();
+        }
+
+        public void InvokeMouseScroll(float value)
+        {
+            OnMouseScroll?.Invoke(value);
+        }
+
+        public void InvokeClickRightHold(bool isHeld)
+        {
+            OnClickRightHold?.Invoke(isHeld);
         }
     }
 }
