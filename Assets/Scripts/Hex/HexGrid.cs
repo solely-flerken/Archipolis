@@ -138,13 +138,11 @@ namespace Hex
 
         public HexCell GetNearestHexCellToMousePosition()
         {
-            var mouseToWorldPosition = MouseUtils.MouseToWorldPosition(Camera.main);
+            var mouseToWorldPosition = MouseUtils.MouseToWorldPosition(Camera.main, Vector3.up);
 
-            if (mouseToWorldPosition is not { } mousePosition) return null;
+            mouseToWorldPosition.y = 0;
 
-            mousePosition.y = 0;
-
-            var cell = GetNearestHexCell(mousePosition);
+            var cell = GetNearestHexCell(mouseToWorldPosition);
 
             return cell;
         }
@@ -156,7 +154,7 @@ namespace Hex
 
             return cellCoordinatesInTissue.Select(GetCell).ToList();
         }
-        
+
         public static HexCoordinate[] RotateHexesClockwise(HexCoordinate origin, HexCoordinate[] hexes)
         {
             var rotatedHexes = new HexCoordinate[hexes.Length];
