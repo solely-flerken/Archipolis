@@ -144,6 +144,15 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""MouseWheelClick"",
+                    ""type"": ""Button"",
+                    ""id"": ""7c99bbd2-437d-4fdb-ba96-0a77f7f1a1d7"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -212,6 +221,17 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""action"": ""MouseScroll"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""3628d649-2f51-4162-a1ef-ec157f915ccd"",
+                    ""path"": ""<Mouse>/middleButton"",
+                    ""interactions"": ""Hold(duration=0.1)"",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""MouseWheelClick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -226,6 +246,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_General_Cancel = m_General.FindAction("Cancel", throwIfNotFound: true);
         m_General_ClickRight = m_General.FindAction("ClickRight", throwIfNotFound: true);
         m_General_MouseScroll = m_General.FindAction("MouseScroll", throwIfNotFound: true);
+        m_General_MouseWheelClick = m_General.FindAction("MouseWheelClick", throwIfNotFound: true);
     }
 
     ~@InputActions()
@@ -312,6 +333,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_General_Cancel;
     private readonly InputAction m_General_ClickRight;
     private readonly InputAction m_General_MouseScroll;
+    private readonly InputAction m_General_MouseWheelClick;
     /// <summary>
     /// Provides access to input actions defined in input action map "General".
     /// </summary>
@@ -347,6 +369,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "General/MouseScroll".
         /// </summary>
         public InputAction @MouseScroll => m_Wrapper.m_General_MouseScroll;
+        /// <summary>
+        /// Provides access to the underlying input action "General/MouseWheelClick".
+        /// </summary>
+        public InputAction @MouseWheelClick => m_Wrapper.m_General_MouseWheelClick;
         /// <summary>
         /// Provides access to the underlying input action map instance.
         /// </summary>
@@ -391,6 +417,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @MouseScroll.started += instance.OnMouseScroll;
             @MouseScroll.performed += instance.OnMouseScroll;
             @MouseScroll.canceled += instance.OnMouseScroll;
+            @MouseWheelClick.started += instance.OnMouseWheelClick;
+            @MouseWheelClick.performed += instance.OnMouseWheelClick;
+            @MouseWheelClick.canceled += instance.OnMouseWheelClick;
         }
 
         /// <summary>
@@ -420,6 +449,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @MouseScroll.started -= instance.OnMouseScroll;
             @MouseScroll.performed -= instance.OnMouseScroll;
             @MouseScroll.canceled -= instance.OnMouseScroll;
+            @MouseWheelClick.started -= instance.OnMouseWheelClick;
+            @MouseWheelClick.performed -= instance.OnMouseWheelClick;
+            @MouseWheelClick.canceled -= instance.OnMouseWheelClick;
         }
 
         /// <summary>
@@ -502,5 +534,12 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnMouseScroll(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "MouseWheelClick" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnMouseWheelClick(InputAction.CallbackContext context);
     }
 }

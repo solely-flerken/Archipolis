@@ -22,16 +22,23 @@ namespace Events
             }
         }
 
+        // Mouse
+        public event Action<float> OnMouseScroll;
         public event Action OnClick;
         public event Action OnClickRight;
         public event Action<bool> OnClickRightHold;
-        public event Action<float> OnMouseScroll;
+        public event Action OnMouseWheelClick;
+        public event Action<bool> OnMouseWheelHold;
+        
+        // Keyboard
+        public event Action<GameObject> OnKeyR;
+        public event Action OnCancel;
+        
+        // Custom
         public event Action<GameObject> OnClickableClick;
         public event Action<GameObject> OnBuildingClick;
         public event Action<GameObject> OnBuildingPlaced;
-        public event Action<GameObject> OnKeyR;
-        public event Action OnCancel;
-
+        
         public void InvokeClick()
         {
             OnClick?.Invoke();
@@ -90,6 +97,16 @@ namespace Events
         public void InvokeClickRightHold(bool isHeld)
         {
             OnClickRightHold?.Invoke(isHeld);
+        }
+
+        public void InvokeMouseWheelClick()
+        {
+            OnMouseWheelClick?.Invoke();
+        }
+
+        public void InvokeMouseWheelHold(bool isHeld)
+        {
+            OnMouseWheelHold?.Invoke(isHeld);
         }
     }
 }

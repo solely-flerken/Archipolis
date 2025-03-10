@@ -58,6 +58,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
+                },
+                {
+                    "name": "MouseWheelClick",
+                    "type": "Button",
+                    "id": "7c99bbd2-437d-4fdb-ba96-0a77f7f1a1d7",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -124,6 +133,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "MouseScroll",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3628d649-2f51-4162-a1ef-ec157f915ccd",
+                    "path": "<Mouse>/middleButton",
+                    "interactions": "Hold(duration=0.1)",
+                    "processors": "",
+                    "groups": "",
+                    "action": "MouseWheelClick",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
