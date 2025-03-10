@@ -138,7 +138,7 @@ namespace Hex
 
         public HexCell GetNearestHexCellToMousePosition()
         {
-            var mouseToWorldPosition = MouseUtils.MouseToWorldPosition(Camera.main, Vector3.up);
+            var mouseToWorldPosition = MouseUtils.MouseToWorldPosition(Vector3.up, Camera.main);
 
             mouseToWorldPosition.y = 0;
 

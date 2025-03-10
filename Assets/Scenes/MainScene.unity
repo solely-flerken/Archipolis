@@ -271,9 +271,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   initialPosition: {x: 0, y: 100, z: 0}
   zoomSpeed: 10
-  minZoom: 10
   maxZoom: 40
   zoomSmoothTime: 0.1
+  rotationSpeed: 1
+  rotationThreshold: 0.5
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
