@@ -64,7 +64,7 @@ namespace Events
             OnClickableClick?.Invoke(obj);
         }
 
-        private void InvokeBuildingClick(GameObject obj)
+        public void InvokeBuildingClick(GameObject obj)
         {
             OnBuildingClick?.Invoke(obj);
         }
