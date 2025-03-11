@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Input;
 using UnityEngine;
 using Utils;
 
@@ -110,7 +111,7 @@ namespace Hex
             }
             else
             {
-                s = -q - r;
+                // s = -q - r; Not needed directly but helps for clarity
             }
 
             return new HexCoordinate(q, r);
@@ -138,7 +139,7 @@ namespace Hex
 
         public HexCell GetNearestHexCellToMousePosition()
         {
-            var mouseToWorldPosition = MouseUtils.MouseToWorldPosition(Vector3.up, Camera.main);
+            var mouseToWorldPosition = MouseUtils.MouseToWorldPosition(Vector3.up, CameraController.Camera);
 
             mouseToWorldPosition.y = 0;
 
@@ -168,7 +169,7 @@ namespace Hex
                 // Apply clockwise hex rotation (60 degrees)
                 var newQ = -s;
                 var newR = -q;
-                var newS = -r; // Not needed directly but helps for clarity
+                // var newS = -r; Not needed directly but helps for clarity
 
                 rotatedHexes[i] = new HexCoordinate(newQ + origin.Q, newR + origin.R);
             }
