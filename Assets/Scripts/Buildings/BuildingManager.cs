@@ -87,8 +87,16 @@ namespace Buildings
 
         private void HandleCancel()
         {
+            // TODO: Refactor this
+            if (!HexGridManager.Instance.hexGrid.hexCells.Exists(cell => cell.OccupiedBy == _selectedObject))
+            {
+                Destroy(_selectedObject);
+            }
+            
             SelectedBuilding.Origin = SelectedBuilding.InitialPosition;
-            _selectedObject.transform.position = HexGridManager.Instance.hexGrid.GetCell(SelectedBuilding.Origin).transform.position;
+
+            var cell = HexGridManager.Instance.hexGrid.GetCell(SelectedBuilding.Origin);
+            _selectedObject.transform.position = cell.transform.position;
             
             // We need this here since it won't be called in update(), because we set _selectedObject to null
             var isValidPlacement = IsPlacementValid(SelectedBuilding);
