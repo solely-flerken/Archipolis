@@ -1,31 +1,35 @@
 using Events;
-using Input;
 using UnityEngine;
 using UnityEngine.UIElements;
-using Utils;
 
 namespace UI
 {
     public class UI : MonoBehaviour
     {
-        public GameObject prefab;
-
         private void OnEnable()
         {
             var root = GetComponent<UIDocument>().rootVisualElement;
         
+            // TODO: Create like a static building storage which stores all unique available buildings in the game,
+            // with a unique identifier and prefab
+            // Get the count of the list and create buttons according to the number. Name each button after that identifier or a readable name
+            
             var buttonBuild1 = root.Q<Button>("Build1");
             var buttonBuild2 = root.Q<Button>("Build2");
             var buttonBuild3 = root.Q<Button>("Build3");
 
             buttonBuild1.clicked += () =>
             {
-                var position = MouseUtils.MouseToWorldPosition(Vector3.up, CameraController.Camera);
-                var newBuilding = Instantiate(prefab, position, Quaternion.identity);
-                EventSystem.Instance.InvokeBuildingClick(newBuilding);
+                EventSystem.Instance.InvokeOnPlaceBuildingUI("");
             };
-            buttonBuild2.clicked += () => { };
-            buttonBuild3.clicked += () => { };
+            buttonBuild2.clicked += () =>
+            {
+                EventSystem.Instance.InvokeOnPlaceBuildingUI("");
+            };
+            buttonBuild3.clicked += () =>
+            {
+                EventSystem.Instance.InvokeOnPlaceBuildingUI("");
+            };
         }
     }
 }

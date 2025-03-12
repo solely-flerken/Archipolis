@@ -1,14 +1,18 @@
 ﻿using System.Linq;
 using Events;
 using Hex;
+using Input;
 using UnityEngine;
+using Utils;
 
 namespace Buildings
 {
     public class BuildingManager : MonoBehaviour
     {
         public static BuildingManager Instance { get; private set; }
-
+        
+        public GameObject prefab;
+        
         private GameObject _selectedObject;
         private Building SelectedBuilding => _selectedObject?.GetComponent<Building>();
 
@@ -35,6 +39,7 @@ namespace Buildings
             EventSystem.Instance.OnKeyR += HandleBuildingRotate;
             EventSystem.Instance.OnCancel += HandleCancel;
             EventSystem.Instance.OnBuildingPlaced += HandleBuildingPlaced;
+            EventSystem.Instance.OnPlaceBuildingUI += HandlePlaceBuilding;
         }
 
         private void Update()
@@ -65,6 +70,7 @@ namespace Buildings
             EventSystem.Instance.OnKeyR -= HandleBuildingRotate;
             EventSystem.Instance.OnCancel -= HandleCancel;
             EventSystem.Instance.OnBuildingPlaced -= HandleBuildingPlaced;
+            EventSystem.Instance.OnPlaceBuildingUI -= HandlePlaceBuilding;
         }
 
         private void HandleBuildingPlaced(GameObject obj)
@@ -145,6 +151,21 @@ namespace Buildings
             building.RotateFootprint();
         }
 
+        private void HandlePlaceBuilding(string identifier)
+        {
+            // TODO: Spawn different building based on identifier
+            var currentPrefab = prefab;
+
+            if (!currentPrefab)
+            {
+                return;
+            }
+            
+            var position = MouseUtils.MouseToWorldPosition(Vector3.up, CameraController.Camera);
+            var newBuilding = Instantiate(currentPrefab, position, Quaternion.identity);
+            EventSystem.Instance.InvokeBuildingClick(newBuilding);
+        }
+        
         private static void ColorBasedOnValidity(bool isValid, Building building)
         {
             building.SetColor(isValid ? BaseOverlay : InvalidOverlay);
