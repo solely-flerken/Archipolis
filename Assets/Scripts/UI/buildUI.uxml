@@ -1,10 +1,6 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <Style src="project://database/Assets/Scripts/UI/buildUI.uss?fileID=7433441132597879392&amp;guid=05fd6784dd278a64f9744c0b4be2b679&amp;type=3#buildUI" />
     <ui:VisualElement name="Body" style="flex-grow: 1; justify-content: flex-end; align-content: center; width: 100%; height: 100%; align-items: center;">
-        <ui:VisualElement name="ButtonContainer" style="width: 90%; height: 10%; justify-content: space-evenly; align-content: center; align-items: center; flex-direction: row; font-size: 24px; -unity-font-style: bold;">
-            <ui:Button text="Build 1&#10;" name="Build1" class="button" />
-            <ui:Button text="Build 2" name="Build2" class="button" />
-            <ui:Button text="Build 3" name="Build3" class="button" />
-        </ui:VisualElement>
+        <ui:VisualElement name="ButtonContainer" style="width: 90%; height: 10%; justify-content: space-evenly; align-content: center; align-items: center; flex-direction: row; font-size: 24px; -unity-font-style: bold;" />
     </ui:VisualElement>
 </ui:UXML>

@@ -153,16 +153,15 @@ namespace Buildings
 
         private void HandlePlaceBuilding(string identifier)
         {
-            // TODO: Spawn different building based on identifier
-            var currentPrefab = prefab;
+            var building = BuildingDatabase.GetBuildingByID(identifier);
 
-            if (!currentPrefab)
+            if (!building.Prefab)
             {
                 return;
             }
             
             var position = MouseUtils.MouseToWorldPosition(Vector3.up, CameraController.Camera);
-            var newBuilding = Instantiate(currentPrefab, position, Quaternion.identity);
+            var newBuilding = Instantiate(building.Prefab, position, Quaternion.identity);
             EventSystem.Instance.InvokeBuildingClick(newBuilding);
         }
         
