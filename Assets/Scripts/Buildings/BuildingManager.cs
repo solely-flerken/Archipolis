@@ -2,6 +2,7 @@
 using Events;
 using Hex;
 using Input;
+using UI;
 using UnityEngine;
 using Utils;
 
@@ -116,6 +117,20 @@ namespace Buildings
 
         private void HandleBuildingClick(GameObject obj)
         {
+            if (_isBulldozing)
+            {
+                ConfirmationDialog.Show("Are you sure to delete this building?", () =>
+                {
+                    foreach (var cell in HexGridManager.Instance.hexGrid.hexCells.Where(cell => cell.OccupiedBy == obj))
+                    {
+                        cell.OccupiedBy = null;
+                    }
+
+                    Destroy(obj);
+                });
+                return;
+            }
+            
             if (_selectedObject is not null)
             {
                 // Try place object. Only place the building if placement is valid
