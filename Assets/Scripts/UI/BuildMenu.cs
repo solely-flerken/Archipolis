@@ -5,16 +5,12 @@ using UnityEngine.UIElements;
 
 namespace UI
 {
-    public class UI : MonoBehaviour
+    public class BuildMenu : MonoBehaviour
     {
         private void OnEnable()
         {
             var root = GetComponent<UIDocument>().rootVisualElement;
-            var buttonContainer = root.Q<VisualElement>("ButtonContainer");
-
-            // TODO: Create like a static building storage which stores all unique available buildings in the game,
-            // with a unique identifier and prefab
-            // Get the count of the list and create buttons according to the number. Name each button after that identifier or a readable name
+            var buttonContainer = root.Q<VisualElement>("primaryTools");
 
             var allBuildings = BuildingDatabase.GetAllBuildings();
 
@@ -29,6 +25,9 @@ namespace UI
                 button.AddToClassList("button");
                 buttonContainer.Add(button);
             }
+
+            var deleteButton = root.Q<Button>("delete");
+            deleteButton.clicked += () => { EventSystem.Instance.InvokeBulldoze(); };
         }
     }
 }
