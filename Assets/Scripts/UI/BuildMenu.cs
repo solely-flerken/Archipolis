@@ -1,5 +1,6 @@
 using Buildings;
 using Events;
+using State;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -27,7 +28,11 @@ namespace UI
             }
 
             var deleteButton = root.Q<Button>("delete");
-            deleteButton.clicked += () => { EventSystem.Instance.InvokeBulldoze(); };
+            deleteButton.clicked += () =>
+            {
+                var newState = !StateManager.Instance.IsBulldoze;
+                StateManager.Instance.SetBulldoze(newState);
+            };
         }
     }
 }

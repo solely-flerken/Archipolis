@@ -2,6 +2,7 @@
 using Events;
 using Hex;
 using Input;
+using State;
 using UI;
 using UnityEngine;
 using Utils;
@@ -14,9 +15,6 @@ namespace Buildings
         
         private GameObject _selectedObject;
         private Building SelectedBuilding => _selectedObject?.GetComponent<Building>();
-
-        // States
-        private bool _isBulldozing;
         
         private static readonly Color BaseOverlay = new(0, 0, 0, 0.0f);
         private static readonly Color InvalidOverlay = new(1, 0, 0, 1f);
@@ -42,7 +40,6 @@ namespace Buildings
             EventSystem.Instance.OnCancel += HandleCancel;
             EventSystem.Instance.OnBuildingPlaced += HandleBuildingPlaced;
             EventSystem.Instance.OnPlaceBuildingUI += HandlePlaceBuilding;
-            EventSystem.Instance.OnBulldoze += HandleBulldoze;
         }
 
         private void Update()
@@ -74,7 +71,6 @@ namespace Buildings
             EventSystem.Instance.OnCancel -= HandleCancel;
             EventSystem.Instance.OnBuildingPlaced -= HandleBuildingPlaced;
             EventSystem.Instance.OnPlaceBuildingUI -= HandlePlaceBuilding;
-            EventSystem.Instance.OnBulldoze -= HandleBulldoze;
         }
 
         private void HandleBuildingPlaced(GameObject obj)
@@ -117,7 +113,7 @@ namespace Buildings
 
         private void HandleBuildingClick(GameObject obj)
         {
-            if (_isBulldozing)
+            if (StateManager.Instance.IsBulldoze)
             {
                 ConfirmationDialog.Show("Are you sure to delete this building?", () =>
                 {
@@ -181,12 +177,6 @@ namespace Buildings
             var position = MouseUtils.MouseToWorldPosition(Vector3.up, CameraController.Camera);
             var newBuilding = Instantiate(building.Prefab, position, Quaternion.identity);
             EventSystem.Instance.InvokeBuildingClick(newBuilding);
-        }
-        
-        private void HandleBulldoze()
-        {
-            _isBulldozing = !_isBulldozing;
-            Debug.Log($"Bulldoze is {_isBulldozing}");
         }
         
         private static void ColorBasedOnValidity(bool isValid, Building building)
