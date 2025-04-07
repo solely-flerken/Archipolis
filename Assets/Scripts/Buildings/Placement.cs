@@ -1,5 +1,4 @@
-﻿using System;
-using Events;
+﻿using Events;
 using Hex;
 using UnityEngine;
 
@@ -19,7 +18,7 @@ namespace Buildings
 
         private void Update()
         {
-            var cells = HexGridManager.Instance.hexGrid.hexCells;
+            var cells = HexGridManager.Instance.HexGrid.hexCells;
 
             foreach (var cell in cells)
             {

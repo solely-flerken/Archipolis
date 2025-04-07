@@ -10,7 +10,7 @@ namespace Hex
         public int radius = 3;
         public int spacing = 1;
         
-        public HexGrid hexGrid;
+        public HexGrid HexGrid {get; private set;}
 
         private void Awake()
         {
@@ -24,8 +24,8 @@ namespace Hex
                 Destroy(gameObject);
             }
             
-            hexGrid = this.AddComponent<HexGrid>();
-            hexGrid.spacing = spacing;
+            HexGrid = this.AddComponent<HexGrid>();
+            HexGrid.spacing = spacing;
             
             GenerateRoundHexGrid();
         }
@@ -39,7 +39,7 @@ namespace Hex
                     var s = -q - r;
                     if (Mathf.Abs(s) <= radius)
                     {
-                        hexGrid.CreateCell(q, r);
+                        HexGrid.CreateCell(q, r);
                     }
                 }
             }

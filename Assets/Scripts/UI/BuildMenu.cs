@@ -19,7 +19,7 @@ namespace UI
                 var button = new Button(() => { EventSystem.Instance.InvokeOnPlaceBuildingUI(building.ID); })
                 {
                     text = building.Name,
-                    name = "Build" + building.ID
+                    name = "build-" + building.ID
                 };
 
                 button.AddToClassList("button");

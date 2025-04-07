@@ -49,7 +49,7 @@ namespace Buildings
         {
             if (!_selectedObject) return;
 
-            var cell = HexGridManager.Instance.hexGrid.GetNearestHexCellToMousePosition();
+            var cell = HexGridManager.Instance.HexGrid.GetNearestHexCellToMousePosition();
             if (cell is null) return;
 
             // Snap to grid
@@ -80,13 +80,13 @@ namespace Buildings
         private void HandleBuildingPlaced(GameObject obj)
         {
             // Free occupied cells
-            HexGridManager.Instance.hexGrid.hexCells
+            HexGridManager.Instance.HexGrid.hexCells
                 .Where(x => x.OccupiedBy == obj)
                 .ToList()
                 .ForEach(x => x.OccupiedBy = null);
 
             // Occupy new cells
-            var newTissue = HexGridManager.Instance.hexGrid.GetTissue(SelectedBuilding.Origin, SelectedBuilding.Footprint);
+            var newTissue = HexGridManager.Instance.HexGrid.GetTissue(SelectedBuilding.Origin, SelectedBuilding.Footprint);
             foreach (var cell in newTissue)
             {
                 cell.OccupiedBy = obj;
@@ -98,14 +98,14 @@ namespace Buildings
         private void HandleCancel()
         {
             // TODO: Refactor this
-            if (!HexGridManager.Instance.hexGrid.hexCells.Exists(cell => cell.OccupiedBy == _selectedObject))
+            if (!HexGridManager.Instance.HexGrid.hexCells.Exists(cell => cell.OccupiedBy == _selectedObject))
             {
                 Destroy(_selectedObject);
             }
             
             SelectedBuilding.Origin = SelectedBuilding.InitialPosition;
 
-            var cell = HexGridManager.Instance.hexGrid.GetCell(SelectedBuilding.Origin);
+            var cell = HexGridManager.Instance.HexGrid.GetCell(SelectedBuilding.Origin);
             _selectedObject.transform.position = cell.transform.position;
             
             // We need this here since it won't be called in update(), because we set _selectedObject to null
@@ -121,7 +121,7 @@ namespace Buildings
             {
                 ConfirmationDialog.Show("Are you sure to delete this building?", () =>
                 {
-                    foreach (var cell in HexGridManager.Instance.hexGrid.hexCells.Where(cell => cell.OccupiedBy == obj))
+                    foreach (var cell in HexGridManager.Instance.HexGrid.hexCells.Where(cell => cell.OccupiedBy == obj))
                     {
                         cell.OccupiedBy = null;
                     }
@@ -134,7 +134,7 @@ namespace Buildings
             if (_selectedObject is not null)
             {
                 // Try place object. Only place the building if placement is valid
-                var originCell = HexGridManager.Instance.hexGrid.GetNearestHexCell(obj.transform.position);
+                var originCell = HexGridManager.Instance.HexGrid.GetNearestHexCell(obj.transform.position);
 
                 if (SelectedBuilding is null) return;
 
@@ -150,7 +150,7 @@ namespace Buildings
                 _selectedObject = obj;
 
                 var objectHexCell =
-                    HexGridManager.Instance.hexGrid.GetNearestHexCell(_selectedObject.transform.position);
+                    HexGridManager.Instance.HexGrid.GetNearestHexCell(_selectedObject.transform.position);
 
                 if (objectHexCell is null) return;
                 if (SelectedBuilding is null) return;
@@ -196,7 +196,7 @@ namespace Buildings
 
         private static bool IsPlacementValid(Building building)
         {
-            var cell = HexGridManager.Instance.hexGrid.GetNearestHexCell(building.transform.position);
+            var cell = HexGridManager.Instance.HexGrid.GetNearestHexCell(building.transform.position);
             if (cell is null) return false;
 
             var coordinate = cell.HexCoordinate;
@@ -205,7 +205,7 @@ namespace Buildings
                 new HexCoordinate(coordinate.Q + offset.Q, coordinate.R + offset.R)).ToList();
 
             var isInvalidPlacement = adjacentHexCoordinates
-                .Select(adjacentHex => HexGridManager.Instance.hexGrid.GetCell(adjacentHex))
+                .Select(adjacentHex => HexGridManager.Instance.HexGrid.GetCell(adjacentHex))
                 .Any(adjacentCell => adjacentCell is null ||
                                      (adjacentCell.Occupied && adjacentCell.OccupiedBy != building.gameObject));
 
