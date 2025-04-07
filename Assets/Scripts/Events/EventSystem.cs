@@ -32,6 +32,7 @@ namespace Events
         
         // Keyboard
         public event Action<GameObject> OnKeyR;
+        public event Action OnKeyF3;
         public event Action OnCancel;
         
         // UI
@@ -83,6 +84,11 @@ namespace Events
             OnKeyR?.Invoke(null);
         }
 
+        public void InvokeKeyF3()
+        {
+            OnKeyF3?.Invoke();
+        }
+        
         public void InvokeCancel()
         {
             OnCancel?.Invoke();

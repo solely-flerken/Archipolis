@@ -53,6 +53,13 @@ namespace Input
             EventSystem.Instance.InvokeKeyR();
         }
 
+        public void OnF3(InputAction.CallbackContext context)
+        {
+            if (!context.performed) return;
+            
+            EventSystem.Instance.InvokeKeyF3();
+        }
+        
         public void OnCancel(InputAction.CallbackContext context)
         {
             if (!context.performed) return;

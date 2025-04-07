@@ -119,6 +119,15 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""F3"",
+                    ""type"": ""Button"",
+                    ""id"": ""ed5c54bb-94a0-400c-9c72-15de5b41e40d"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""Cancel"",
                     ""type"": ""Button"",
                     ""id"": ""34022040-0e1a-4efc-95f9-f15d5cf3cd0c"",
@@ -232,6 +241,17 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
                     ""action"": ""MouseWheelClick"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c3c2367a-50e2-4b8a-8d8a-5e29fdbd2228"",
+                    ""path"": ""<Keyboard>/f3"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""F3"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -243,6 +263,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         m_General_Click = m_General.FindAction("Click", throwIfNotFound: true);
         m_General_MousePosition = m_General.FindAction("Mouse Position", throwIfNotFound: true);
         m_General_R = m_General.FindAction("R", throwIfNotFound: true);
+        m_General_F3 = m_General.FindAction("F3", throwIfNotFound: true);
         m_General_Cancel = m_General.FindAction("Cancel", throwIfNotFound: true);
         m_General_ClickRight = m_General.FindAction("ClickRight", throwIfNotFound: true);
         m_General_MouseScroll = m_General.FindAction("MouseScroll", throwIfNotFound: true);
@@ -330,6 +351,7 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
     private readonly InputAction m_General_Click;
     private readonly InputAction m_General_MousePosition;
     private readonly InputAction m_General_R;
+    private readonly InputAction m_General_F3;
     private readonly InputAction m_General_Cancel;
     private readonly InputAction m_General_ClickRight;
     private readonly InputAction m_General_MouseScroll;
@@ -357,6 +379,10 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// Provides access to the underlying input action "General/R".
         /// </summary>
         public InputAction @R => m_Wrapper.m_General_R;
+        /// <summary>
+        /// Provides access to the underlying input action "General/F3".
+        /// </summary>
+        public InputAction @F3 => m_Wrapper.m_General_F3;
         /// <summary>
         /// Provides access to the underlying input action "General/Cancel".
         /// </summary>
@@ -408,6 +434,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @R.started += instance.OnR;
             @R.performed += instance.OnR;
             @R.canceled += instance.OnR;
+            @F3.started += instance.OnF3;
+            @F3.performed += instance.OnF3;
+            @F3.canceled += instance.OnF3;
             @Cancel.started += instance.OnCancel;
             @Cancel.performed += instance.OnCancel;
             @Cancel.canceled += instance.OnCancel;
@@ -440,6 +469,9 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
             @R.started -= instance.OnR;
             @R.performed -= instance.OnR;
             @R.canceled -= instance.OnR;
+            @F3.started -= instance.OnF3;
+            @F3.performed -= instance.OnF3;
+            @F3.canceled -= instance.OnF3;
             @Cancel.started -= instance.OnCancel;
             @Cancel.performed -= instance.OnCancel;
             @Cancel.canceled -= instance.OnCancel;
@@ -513,6 +545,13 @@ public partial class @InputActions: IInputActionCollection2, IDisposable
         /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
         /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
         void OnR(InputAction.CallbackContext context);
+        /// <summary>
+        /// Method invoked when associated input action "F3" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+        /// </summary>
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+        /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+        void OnF3(InputAction.CallbackContext context);
         /// <summary>
         /// Method invoked when associated input action "Cancel" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
         /// </summary>

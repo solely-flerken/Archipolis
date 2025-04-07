@@ -33,6 +33,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "F3",
+                    "type": "Button",
+                    "id": "ed5c54bb-94a0-400c-9c72-15de5b41e40d",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Cancel",
                     "type": "Button",
                     "id": "34022040-0e1a-4efc-95f9-f15d5cf3cd0c",
@@ -144,6 +153,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "MouseWheelClick",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c3c2367a-50e2-4b8a-8d8a-5e29fdbd2228",
+                    "path": "<Keyboard>/f3",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "F3",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
