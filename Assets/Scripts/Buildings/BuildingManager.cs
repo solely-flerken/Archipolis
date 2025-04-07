@@ -12,10 +12,10 @@ namespace Buildings
     public class BuildingManager : MonoBehaviour
     {
         public static BuildingManager Instance { get; private set; }
-        
+
         private GameObject _selectedObject;
         private Building SelectedBuilding => _selectedObject?.GetComponent<Building>();
-        
+
         private static readonly Color BaseOverlay = new(0, 0, 0, 0.0f);
         private static readonly Color InvalidOverlay = new(1, 0, 0, 1f);
         private static readonly Color ValidOverlay = new(0, 1, 0, 1f);
@@ -62,6 +62,12 @@ namespace Buildings
 
             // Overlay color based on placement validity
             ColorBasedOnValidity(isValidPlacement, building);
+
+            // TODO: Refactor this (expensive)
+            HexGridManager.Instance.HexGrid.hexCells.ForEach(x => x.Preview = false);
+            var adjacentHexCells =
+                HexGridManager.Instance.HexGrid.GetTissue(cell.HexCoordinate, SelectedBuilding.Footprint);
+            adjacentHexCells.Where(x => x is not null).ToList().ForEach(x => x.Preview = true);
         }
 
         private void OnDestroy()
@@ -82,7 +88,8 @@ namespace Buildings
                 .ForEach(x => x.OccupiedBy = null);
 
             // Occupy new cells
-            var newTissue = HexGridManager.Instance.HexGrid.GetTissue(SelectedBuilding.Origin, SelectedBuilding.Footprint);
+            var newTissue =
+                HexGridManager.Instance.HexGrid.GetTissue(SelectedBuilding.Origin, SelectedBuilding.Footprint);
             foreach (var cell in newTissue)
             {
                 cell.OccupiedBy = obj;
@@ -93,23 +100,23 @@ namespace Buildings
 
         private void HandleCancel()
         {
-            if(SelectedBuilding == null) return;
-            
+            if (SelectedBuilding == null) return;
+
             // TODO: Refactor this
             if (!HexGridManager.Instance.HexGrid.hexCells.Exists(cell => cell.OccupiedBy == _selectedObject))
             {
                 Destroy(_selectedObject);
             }
-            
+
             SelectedBuilding.Origin = SelectedBuilding.InitialPosition;
 
             var cell = HexGridManager.Instance.HexGrid.GetCell(SelectedBuilding.Origin);
             _selectedObject.transform.position = cell.transform.position;
-            
+
             // We need this here since it won't be called in update(), because we set _selectedObject to null
             var isValidPlacement = IsPlacementValid(SelectedBuilding);
             ColorBasedOnValidity(isValidPlacement, SelectedBuilding);
-            
+
             _selectedObject = null;
         }
 
@@ -128,7 +135,7 @@ namespace Buildings
                 });
                 return;
             }
-            
+
             if (_selectedObject is not null)
             {
                 // Try place object. Only place the building if placement is valid
@@ -175,12 +182,12 @@ namespace Buildings
             {
                 return;
             }
-            
+
             var position = MouseUtils.MouseToWorldPosition(Vector3.up, CameraController.Camera);
             var newBuilding = Instantiate(building.Prefab, position, Quaternion.identity);
             EventSystem.Instance.InvokeBuildingClick(newBuilding);
         }
-        
+
         private static void ColorBasedOnValidity(bool isValid, Building building)
         {
             building.SetColor(isValid ? BaseOverlay : InvalidOverlay);

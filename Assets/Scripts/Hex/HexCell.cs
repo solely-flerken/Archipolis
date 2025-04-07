@@ -5,10 +5,11 @@ namespace Hex
 {
     public class HexCell : MonoBehaviour, IClickable
     {
-        public HexCoordinate HexCoordinate {get; set;}
-        
-        public GameObject OccupiedBy {get; set;}
+        public HexCoordinate HexCoordinate { get; set; }
+
+        public GameObject OccupiedBy { get; set; }
         public bool Occupied => OccupiedBy;
+        public bool Preview { get; set; }
 
         private void OnDrawGizmos()
         {

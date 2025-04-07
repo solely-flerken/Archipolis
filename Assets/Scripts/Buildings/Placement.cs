@@ -1,20 +1,13 @@
-﻿using Events;
-using Hex;
+﻿using Hex;
 using UnityEngine;
 
 namespace Buildings
 {
     public class Placement : MonoBehaviour
     {
-        private void Start()
-        {
-            EventSystem.Instance.OnBuildingPlaced += CheckHexGrid;
-        }
-
-        public void OnDestroy()
-        {
-            EventSystem.Instance.OnBuildingPlaced -= CheckHexGrid;
-        }
+        private static readonly Color CellOccupied = new(0.8f, 0.3f, 0.5f);
+        private static readonly Color CellPreview = new(0f, 1f, 0f, 0.5f);
+        private static readonly Color CellBase = new(0f, 0f, 0f, 0f);
 
         private void Update()
         {
@@ -22,20 +15,21 @@ namespace Buildings
 
             foreach (var cell in cells)
             {
-                if(!cell.TryGetComponent<HexMesh>(out var mesh)) continue;
-                mesh.ChangeColor(cell.Occupied ? new Color(0.8f, 0.3f, 0.5f) : new Color(0f, 0f, 0f, 0f));
-            }
-        }
+                if (!cell.TryGetComponent<HexMesh>(out var mesh)) continue;
 
-        private static void CheckHexGrid(GameObject obj)
-        {
-            // var cells = HexGridManager.Instance.hexGrid.hexCells;
-            //
-            // foreach (var cell in cells)
-            // {
-            //     if(!cell.TryGetComponent<HexMesh>(out var mesh)) continue;
-            //     mesh.ChangeColor(cell.Occupied ? new Color(0.8f, 0.3f, 0.5f) : new Color(0f, 0f, 0f, 0f));
-            // }
+                if (cell.Occupied)
+                {
+                    mesh.ChangeColor(CellOccupied);
+                }
+                else if (cell.Preview)
+                {
+                    mesh.ChangeColor(CellPreview);
+                }
+                else
+                {
+                    mesh.ChangeColor(CellBase);
+                }
+            }
         }
     }
 }
