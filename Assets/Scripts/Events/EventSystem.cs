@@ -37,7 +37,7 @@ namespace Events
         
         // UI
         public event Action<string> OnPlaceBuildingUI;
-        public event Action OnBulldoze;
+        public event Action<bool> OnBulldoze;
         
         // Custom
         public event Action<GameObject> OnClickableClick;
@@ -124,9 +124,9 @@ namespace Events
             OnPlaceBuildingUI?.Invoke(identifier);
         }
 
-        public void InvokeBulldoze()
+        public void InvokeBulldoze(bool isActive)
         {
-            OnBulldoze?.Invoke();
+            OnBulldoze?.Invoke(isActive);
         }
     }
 }
