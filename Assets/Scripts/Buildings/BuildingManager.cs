@@ -93,6 +93,8 @@ namespace Buildings
 
         private void HandleCancel()
         {
+            if(SelectedBuilding == null) return;
+            
             // TODO: Refactor this
             if (!HexGridManager.Instance.HexGrid.hexCells.Exists(cell => cell.OccupiedBy == _selectedObject))
             {
