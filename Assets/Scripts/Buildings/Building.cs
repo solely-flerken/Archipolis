@@ -9,13 +9,12 @@ namespace Buildings
         public int initialYaw;
 
         public HexCoordinate Origin;
-        public HexCoordinate InitialPosition;
 
         /// <summary>
         /// Defines the footprint of the building.
         /// Footprint is build by calculating adjacent hex cells with the offsets.
         /// </summary>
-        public HexCoordinate[] Footprint = { new(0, 0), new(-1, 0), new(-2, 0) };
+        public HexCoordinate[] Footprint = { new(0, 0), new(-1, 0), new(-1, 1) };
 
         private static readonly int OverlayColor = Shader.PropertyToID("_OverlayColor");
 
@@ -29,8 +28,6 @@ namespace Buildings
             _propertyBlock = new MaterialPropertyBlock();
 
             transform.rotation = Quaternion.Euler(0, initialYaw, 0);
-
-            InitialPosition = Origin;
         }
 
         public void RotateBuilding()

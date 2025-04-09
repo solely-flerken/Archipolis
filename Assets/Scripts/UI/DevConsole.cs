@@ -83,13 +83,16 @@ namespace UI
                 case "/clear":
                     ClearConsole();
                     break;
-                case "/setmode bulldoze on":
-                    LogMessage("Bulldoze on");
-                    StateManager.Instance.SetBulldoze(true);
+                case "/setmode bulldoze":
+                    LogMessage("Switched to Bulldoze mode");
+                    ModeStateManager.Instance.SetMode(Mode.Bulldozing);
                     break;
-                case "/setmode bulldoze off":
-                    LogMessage("Bulldoze off");
-                    StateManager.Instance.SetBulldoze(false);
+                case "/setmode idle":
+                    LogMessage("Switched to Idle mode");
+                    ModeStateManager.Instance.SetMode(Mode.Idle);
+                    break;
+                case "/mode":
+                    LogMessage($"Current mode: {ModeStateManager.Instance.ModeState}");
                     break;
                 default:
                     LogMessage("Unknown command: " + command);

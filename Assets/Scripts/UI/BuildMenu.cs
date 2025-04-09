@@ -30,8 +30,14 @@ namespace UI
             var deleteButton = root.Q<Button>("delete");
             deleteButton.clicked += () =>
             {
-                var newState = !StateManager.Instance.IsBulldoze;
-                StateManager.Instance.SetBulldoze(newState);
+                if (ModeStateManager.Instance.ModeState == Mode.Bulldozing)
+                {
+                    ModeStateManager.Instance.SetMode(Mode.Idle);
+                }
+                else
+                {
+                    ModeStateManager.Instance.SetMode(Mode.Bulldozing);
+                }
             };
         }
     }

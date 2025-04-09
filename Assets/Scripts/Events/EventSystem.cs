@@ -1,5 +1,6 @@
 ﻿using System;
 using Buildings;
+using State;
 using UnityEngine;
 using Utils;
 
@@ -37,7 +38,9 @@ namespace Events
         
         // UI
         public event Action<string> OnPlaceBuildingUI;
-        public event Action<bool> OnBulldoze;
+        
+        // State
+        public event Action<Mode> OnModeChanged;
         
         // Custom
         public event Action<GameObject> OnClickableClick;
@@ -123,10 +126,10 @@ namespace Events
         {
             OnPlaceBuildingUI?.Invoke(identifier);
         }
-
-        public void InvokeBulldoze(bool isActive)
+        
+        public void InvokeModeChanged(Mode newMode)
         {
-            OnBulldoze?.Invoke(isActive);
+            OnModeChanged?.Invoke(newMode);
         }
     }
 }
