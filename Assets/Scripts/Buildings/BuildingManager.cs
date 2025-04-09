@@ -175,7 +175,7 @@ namespace Buildings
                 case Mode.Building:
                     if (_selectedBuilding == null) return;
 
-                    // TODO: Refactor this
+                    // Checks if the building is newly created as wasn't placed yet. If this is the case we delete the building on cancel.
                     if (!HexGridManager.Instance.HexGrid.hexCells.Exists(cell => cell.OccupiedBy == _selectedObject))
                     {
                         Destroy(_selectedObject);
