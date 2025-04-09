@@ -30,23 +30,23 @@ namespace Events
         public event Action<bool> OnClickRightHold;
         public event Action OnMouseWheelClick;
         public event Action<bool> OnMouseWheelHold;
-        
+
         // Keyboard
         public event Action<GameObject> OnKeyR;
         public event Action OnKeyF3;
         public event Action OnCancel;
-        
+
         // UI
         public event Action<string> OnPlaceBuildingUI;
-        
+
         // State
         public event Action<Mode> OnModeChanged;
-        
+
         // Custom
         public event Action<GameObject> OnClickableClick;
         public event Action<GameObject> OnBuildingClick;
         public event Action<GameObject> OnBuildingPlaced;
-        
+
         public void InvokeClick()
         {
             OnClick?.Invoke();
@@ -58,8 +58,8 @@ namespace Events
             // Check for IClickable component
             if (!objectUnderMouse.TryGetComponent<IClickable>(out var component)) return;
             component.OnClick(objectUnderMouse);
-            // Worse performance since every component listening to OnClickableClick does checks.
-            // Only use for UI etc.
+
+            // Only use for UI etc. Worse performance since every component listening to OnClickableClick does checks.
             InvokeClickableClick(objectUnderMouse);
 
             // Check for Building component
@@ -91,7 +91,7 @@ namespace Events
         {
             OnKeyF3?.Invoke();
         }
-        
+
         public void InvokeCancel()
         {
             OnCancel?.Invoke();
@@ -126,7 +126,7 @@ namespace Events
         {
             OnPlaceBuildingUI?.Invoke(identifier);
         }
-        
+
         public void InvokeModeChanged(Mode newMode)
         {
             OnModeChanged?.Invoke(newMode);
