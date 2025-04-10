@@ -46,7 +46,7 @@ namespace Buildings
         private void Update()
         {
             if (!_selectedObject || !_selectedBuilding ||
-                ModeStateManager.Instance.ModeState != Mode.Building) return;
+                ModeStateManager.Instance.ModeState != Mode.Placing) return;
 
             // Snap to grid
             var cell = HexGridManager.Instance.HexGrid.GetNearestHexCellToMousePosition();
@@ -99,8 +99,20 @@ namespace Buildings
                         Destroy(obj);
                     });
                     break;
-                // Place building
+                // Pick building up or place building
                 case Mode.Building:
+                {
+                    var objectHexCell =
+                        HexGridManager.Instance.HexGrid.GetNearestHexCell(_selectedObject.transform.position);
+
+                    if (objectHexCell == null) return;
+
+                    _previousPosition = objectHexCell.HexCoordinate;
+
+                    ModeStateManager.Instance.SetMode(Mode.Placing);
+                    break;
+                }
+                case Mode.Placing:
                 {
                     var nearestHexCell =
                         HexGridManager.Instance.HexGrid.GetNearestHexCell(_selectedObject.transform.position);
@@ -112,17 +124,9 @@ namespace Buildings
                     EventSystem.Instance.InvokeBuildingPlaced(_selectedObject);
                     break;
                 }
-                // Pick up building
+                // Show building info
                 case Mode.Idle:
                 {
-                    var objectHexCell =
-                        HexGridManager.Instance.HexGrid.GetNearestHexCell(_selectedObject.transform.position);
-
-                    if (objectHexCell == null) return;
-
-                    _previousPosition = objectHexCell.HexCoordinate;
-
-                    ModeStateManager.Instance.SetMode(Mode.Building);
                     break;
                 }
                 default:
@@ -133,8 +137,6 @@ namespace Buildings
         // Called on UI event when placing a new building.
         private void HandleCreateBuilding(string identifier)
         {
-            ModeStateManager.Instance.SetMode(Mode.Idle);
-
             var building = BuildingDatabase.GetBuildingByID(identifier);
 
             if (building != null && !building.prefab)
@@ -143,13 +145,13 @@ namespace Buildings
             }
 
             var position = MouseUtils.MouseToWorldPosition(Vector3.up, CameraController.Camera);
-            
+
             // Create new building
             var newBuilding = Instantiate(building.prefab, position, Quaternion.identity);
             var buildingComponent = newBuilding.GetComponent<Building>();
             buildingComponent.buildingData = building;
-
-            // "Simulate" click on building to enter build mode
+            
+            ModeStateManager.Instance.SetMode(Mode.Building);
             EventSystem.Instance.InvokeBuildingClick(newBuilding);
         }
 
@@ -170,23 +172,27 @@ namespace Buildings
             }
 
             ResetSelection();
+            // TODO: Only change to building again if the building placed wasn't a new one
+            ModeStateManager.Instance.SetMode(Mode.Building);
         }
 
         private void HandleCancel()
         {
             switch (ModeStateManager.Instance.ModeState)
             {
-                case Mode.Building:
+                case Mode.Placing:
                     if (_selectedBuilding == null) return;
 
-                    // Checks if the building is newly created as wasn't placed yet. If this is the case we delete the building on cancel.
+                    // TODO: Refactor this
+                    HexGridManager.Instance.HexGrid.hexCells.ForEach(x => x.Preview = false);
+                    
+                    // Checks if the building is newly created and wasn't placed yet. If this is the case we delete the building on cancel.
                     if (!HexGridManager.Instance.HexGrid.hexCells.Exists(cell => cell.OccupiedBy == _selectedObject))
                     {
                         Destroy(_selectedObject);
                     }
 
                     _selectedBuilding.Origin = _previousPosition;
-
                     var cell = HexGridManager.Instance.HexGrid.GetCell(_selectedBuilding.Origin);
                     _selectedObject.transform.position = cell.transform.position;
 
@@ -194,6 +200,7 @@ namespace Buildings
                     var isValidPlacement = IsPlacementValid(_selectedBuilding);
                     ColorBasedOnValidity(isValidPlacement, _selectedBuilding);
                     break;
+                case Mode.Building:
                 case Mode.Idle:
                 case Mode.Bulldozing:
                 default:
@@ -202,11 +209,12 @@ namespace Buildings
             }
 
             ResetSelection();
+            ModeStateManager.Instance.SetMode(Mode.Idle);
         }
 
         private void HandleBuildingRotate(GameObject obj)
         {
-            if (ModeStateManager.Instance.ModeState != Mode.Building) return;
+            if (ModeStateManager.Instance.ModeState != Mode.Placing) return;
 
             _selectedBuilding.RotateBuilding();
             _selectedBuilding.RotateFootprint();
@@ -220,7 +228,6 @@ namespace Buildings
         {
             _selectedObject = null;
             _selectedBuilding = null;
-            ModeStateManager.Instance.SetMode(Mode.Idle);
         }
 
         private static void ColorBasedOnValidity(bool isValid, Building building)
