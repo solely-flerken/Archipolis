@@ -39,6 +39,19 @@ namespace UI
                     ModeStateManager.Instance.SetMode(Mode.Bulldozing);
                 }
             };
+
+            var editButton = root.Q<Button>("edit");
+            editButton.clicked += () =>
+            {
+                if (ModeStateManager.Instance.ModeState == Mode.Building)
+                {
+                    ModeStateManager.Instance.SetMode(Mode.Idle);
+                }
+                else
+                {
+                    ModeStateManager.Instance.SetMode(Mode.Building);
+                }
+            };
         }
     }
 }

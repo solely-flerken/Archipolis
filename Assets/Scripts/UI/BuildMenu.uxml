@@ -2,8 +2,9 @@
     <Style src="project://database/Assets/Scripts/UI/BuildMenu.uss?fileID=7433441132597879392&amp;guid=05fd6784dd278a64f9744c0b4be2b679&amp;type=3#BuildMenu" />
     <ui:VisualElement name="menu" style="width: 50%; height: 15%; justify-content: center; align-content: center; align-items: center; background-color: rgba(71, 75, 78, 0.39); border-top-left-radius: 18px; border-top-right-radius: 18px; border-bottom-right-radius: 0; border-bottom-left-radius: 0; border-top-width: 1px; border-right-width: 1px; border-bottom-width: 0; border-left-width: 1px; border-left-color: rgb(150, 75, 0); border-right-color: rgb(150, 75, 0); border-top-color: rgb(150, 75, 0); border-bottom-color: rgb(150, 75, 0); align-self: center; bottom: 0; position: absolute; opacity: 1;">
         <ui:VisualElement name="primaryTools" style="flex-grow: 0; width: 100%; height: 65%; justify-content: center; align-content: center; align-items: center; flex-direction: row;" />
-        <ui:VisualElement name="secondaryTools" style="flex-grow: 0; width: 100%; height: 35%; align-content: center; justify-content: center; align-items: center;">
+        <ui:VisualElement name="secondaryTools" style="flex-grow: 0; width: 100%; height: 35%; align-content: center; justify-content: space-evenly; align-items: center; flex-direction: row;">
             <ui:Button name="delete" style="width: 50px; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; background-color: rgba(55, 55, 55, 0); background-image: resource(&apos;delete&apos;); -unity-background-scale-mode: scale-to-fit; height: 100%; background-position-y: center 0; background-position-x: center 0; padding-top: 10px;" />
+            <ui:Button name="edit" style="width: 50px; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; background-color: rgba(55, 55, 55, 0); background-image: resource(&apos;edit&apos;); -unity-background-scale-mode: scale-to-fit; height: 100%; background-position-y: center 0; background-position-x: center 0; padding-top: 10px;" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
