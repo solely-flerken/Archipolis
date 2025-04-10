@@ -14,24 +14,22 @@ namespace Buildings
 
         private static void Initialize()
         {
-            AddBuilding("SampleBuilding", Resources.Load<GameObject>("Prefabs/Buildings/SampleBuilding"));
-        }
-
-        private static void AddBuilding(string name, GameObject prefab)
-        {
-            if (prefab == null)
+            var buildings = Resources.LoadAll<BuildingData>("Buildings");
+            foreach (var data in buildings)
             {
-                Debug.LogError($"Prefab for {name} is missing!");
-                return;
-            }
+                if (data == null || data.prefab == null)
+                {
+                    Debug.LogError($"Invalid BuildingData or missing prefab for {data?.identifier}");
+                    continue;
+                }
 
-            var newBuilding = new BuildingData(name, prefab);
-            BuildingMap[newBuilding.ID] = newBuilding;
+                BuildingMap[data.identifier] = data;
+            }
         }
 
-        public static BuildingData GetBuildingByID(string identifier)
+        public static BuildingData GetBuildingByID(string id)
         {
-            return BuildingMap.GetValueOrDefault(identifier);
+            return BuildingMap.GetValueOrDefault(id);
         }
 
         public static List<BuildingData> GetAllBuildings()

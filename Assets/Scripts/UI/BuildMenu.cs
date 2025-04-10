@@ -17,10 +17,10 @@ namespace UI
 
             foreach (var building in allBuildings)
             {
-                var button = new Button(() => { EventSystem.Instance.InvokeOnPlaceBuildingUI(building.ID); })
+                var button = new Button(() => { EventSystem.Instance.InvokeOnPlaceBuildingUI(building.identifier); })
                 {
-                    text = building.Name,
-                    name = "build-" + building.ID
+                    text = building.buildingName,
+                    name = "build-" + building.identifier
                 };
 
                 button.AddToClassList("button");

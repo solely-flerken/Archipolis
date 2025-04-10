@@ -6,15 +6,15 @@ namespace Buildings
     [RequireComponent(typeof(MeshRenderer))]
     public class Building : MonoBehaviour, IClickable
     {
-        public int initialYaw;
-
+        public BuildingData buildingData;
+        
         public HexCoordinate Origin;
 
         /// <summary>
         /// Defines the footprint of the building.
         /// Footprint is build by calculating adjacent hex cells with the offsets.
         /// </summary>
-        public HexCoordinate[] Footprint = { new(0, 0), new(-1, 0), new(-1, 1) };
+        public HexCoordinate[] Footprint;
 
         private static readonly int OverlayColor = Shader.PropertyToID("_OverlayColor");
 
@@ -27,13 +27,14 @@ namespace Buildings
             _meshRenderer = GetComponent<MeshRenderer>();
             _propertyBlock = new MaterialPropertyBlock();
 
-            transform.rotation = Quaternion.Euler(0, initialYaw, 0);
+            transform.rotation = Quaternion.Euler(0, buildingData.initialYaw, 0);
+            Footprint = buildingData.footprint;
         }
 
         public void RotateBuilding()
         {
             _yaw = (_yaw + 1) % 6; // 6 rotations: 0, 60, 120, 180, 240, 300 degrees
-            transform.rotation = Quaternion.Euler(0, initialYaw + _yaw * 60, 0);
+            transform.rotation = Quaternion.Euler(0, buildingData.initialYaw + _yaw * 60, 0);
         }
 
         public void RotateFootprint()

@@ -137,13 +137,17 @@ namespace Buildings
 
             var building = BuildingDatabase.GetBuildingByID(identifier);
 
-            if (!building.Prefab)
+            if (building != null && !building.prefab)
             {
                 return;
             }
 
             var position = MouseUtils.MouseToWorldPosition(Vector3.up, CameraController.Camera);
-            var newBuilding = Instantiate(building.Prefab, position, Quaternion.identity);
+            
+            // Create new building
+            var newBuilding = Instantiate(building.prefab, position, Quaternion.identity);
+            var buildingComponent = newBuilding.GetComponent<Building>();
+            buildingComponent.buildingData = building;
 
             // "Simulate" click on building to enter build mode
             EventSystem.Instance.InvokeBuildingClick(newBuilding);

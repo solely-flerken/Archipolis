@@ -1,19 +1,17 @@
 ﻿using System;
+using Hex;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Buildings
 {
-    public class BuildingData
+    [CreateAssetMenu(fileName = "BuildingData", menuName = "Buildings/BuildingData", order = 0)]
+    public class BuildingData : ScriptableObject
     {
-        public string ID { get; }
-        public string Name { get; }
-        public GameObject Prefab { get; }
-
-        public BuildingData(string name, GameObject prefab)
-        {
-            ID = Guid.NewGuid().ToString();
-            Name = name;
-            Prefab = prefab;
-        }
+        public string identifier = Guid.NewGuid().ToString();
+        public string buildingName;
+        public GameObject prefab;
+        public int initialYaw;
+        public HexCoordinate[] footprint = { new(0, 0) };
     }
 }
