@@ -31,9 +31,9 @@ namespace UI
         private void Start()
         {
             _root = GetComponent<UIDocument>().rootVisualElement;
-            _scrollView = _root.Q<ScrollView>("CmdView");
-            _cmdInput = _root.Q<TextField>("CmdInput");
-            _cmdConfirm = _root.Q<Button>("CmdConfirm");
+            _scrollView = _root.Q<ScrollView>("cmdView");
+            _cmdInput = _root.Q<TextField>("cmdInput");
+            _cmdConfirm = _root.Q<Button>("cmdConfirm");
 
             _root.style.display = DisplayStyle.None;
             
