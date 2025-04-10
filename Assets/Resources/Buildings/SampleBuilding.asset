@@ -16,7 +16,7 @@ MonoBehaviour:
   buildingName: Build 1
   prefab: {fileID: 2132833067288156961, guid: 396805b42abddec4c90508ac570a486e, type: 3}
   initialYaw: 0
-  Footprint:
+  footprint:
   - q: 0
     r: 0
   - q: 1
