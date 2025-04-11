@@ -7,7 +7,8 @@ namespace Buildings
     public class Building : MonoBehaviour, IClickable
     {
         public BuildingData buildingData;
-        
+        public BuildingState buildingState;
+
         public HexCoordinate Origin;
 
         /// <summary>
