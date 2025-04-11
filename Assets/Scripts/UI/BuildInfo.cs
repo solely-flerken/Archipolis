@@ -1,4 +1,5 @@
-﻿using Events;
+﻿using Buildings;
+using Events;
 using State;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -8,39 +9,51 @@ namespace UI
     public class BuildInfo : MonoBehaviour
     {
         private VisualElement _root;
+        private Label _name;
+        private Label _population;
+        private Toggle _isActive;
 
         private void Start()
         {
             _root = GetComponent<UIDocument>().rootVisualElement;
+            _name = _root.Q<Label>("name");
+            _population = _root.Q<Label>("population");
+            _isActive = _root.Q<Toggle>("isActive");
 
             _root.style.display = DisplayStyle.None;
 
-            EventSystem.Instance.OnBuildingClick += ToggleShowBuildingInfo;
-            EventSystem.Instance.OnModeChanged += HandleModeChange;
-            EventSystem.Instance.OnCancel += HandleCancel;
+            EventSystem.Instance.OnBuildingClick += ShowBuildingInfo;
+            EventSystem.Instance.OnModeChanged += HideUIOnModeChange;
+            EventSystem.Instance.OnCancel += HideUIOnCancel;
         }
 
         private void OnDestroy()
         {
-            EventSystem.Instance.OnBuildingClick -= ToggleShowBuildingInfo;
-            EventSystem.Instance.OnModeChanged -= HandleModeChange;
-            EventSystem.Instance.OnCancel -= HandleCancel;
+            EventSystem.Instance.OnBuildingClick -= ShowBuildingInfo;
+            EventSystem.Instance.OnModeChanged -= HideUIOnModeChange;
+            EventSystem.Instance.OnCancel -= HideUIOnCancel;
         }
 
-        private void ToggleShowBuildingInfo(GameObject obj)
+        private void ShowBuildingInfo(GameObject clickedObject)
         {
-            if (ModeStateManager.Instance.ModeState == Mode.Idle)
-            {
-                _root.style.display = DisplayStyle.Flex;
-            }
+            if (ModeStateManager.Instance.ModeState != Mode.Idle) return;
+
+            _root.style.display = DisplayStyle.Flex;
+
+            var building = clickedObject.GetComponent<Building>();
+            var viewModel = new ViewModelBuildingState(building.buildingState);
+
+            _name.Bind(viewModel.Identifier, nameof(Label.text));
+            _population.Bind(viewModel.CurrentPopulation, nameof(Label.text));
+            _isActive.Bind(viewModel.IsActive, nameof(Toggle.value), BindingMode.TwoWay);
         }
 
-        private void HandleModeChange(Mode newMode)
+        private void HideUIOnModeChange(Mode newMode)
         {
             _root.style.display = DisplayStyle.None;
         }
 
-        private void HandleCancel()
+        private void HideUIOnCancel()
         {
             _root.style.display = DisplayStyle.None;
         }
