@@ -25,6 +25,9 @@ namespace Buildings
 
         private void Start()
         {
+            // TODO: Refactor this (need to change this when we implement loading/saving building data)
+            buildingState = new BuildingState();
+            
             _meshRenderer = GetComponent<MeshRenderer>();
             _propertyBlock = new MaterialPropertyBlock();
 
