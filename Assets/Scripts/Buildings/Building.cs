@@ -39,7 +39,7 @@ namespace Buildings
 
         public void RotateFootprint()
         {
-            Footprint = HexGrid.RotateHexesClockwise(new HexCoordinate(0,0), Footprint);
+            Footprint = HexGrid.RotateHexesClockwise(new HexCoordinate(0, 0), Footprint);
         }
 
         public void SetColor(Color color)

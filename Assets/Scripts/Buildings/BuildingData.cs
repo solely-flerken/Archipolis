@@ -1,7 +1,6 @@
 ﻿using System;
 using Hex;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Buildings
 {
