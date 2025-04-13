@@ -199,6 +199,9 @@ namespace Buildings
 
         private void HandleLoadGame(BaseSaveData saveData)
         {
+            Buildings.ToList().ForEach(building => DeleteBuilding(building.gameObject));
+            Buildings.Clear();
+
             // TODO: Refactor this
             foreach (var buildingState in saveData.buildings)
             {
@@ -212,6 +215,8 @@ namespace Buildings
                 {
                     cell.OccupiedBy = createBuilding;
                 }
+
+                Buildings.Add(createBuilding.GetComponent<Building>());
             }
         }
 
