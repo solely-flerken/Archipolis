@@ -2,7 +2,8 @@
 {
     public interface ISaveSystem
     {
-        void Save(BaseSaveData saveData);
-        BaseSaveData Load();
+        string Save(BaseSaveData saveData, string fileName);
+        BaseSaveData Load(string fileName);
+        BaseSaveData LoadLatest();
     }
 }

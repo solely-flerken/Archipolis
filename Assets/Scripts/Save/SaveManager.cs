@@ -10,9 +10,6 @@ namespace Save
         public static SaveManager Instance { get; private set; }
 
         private ISaveSystem _saveSystem;
-        
-        [SerializeField]
-        private BaseSaveData currentSaveData;
 
         private void Start()
         {
@@ -30,20 +27,27 @@ namespace Save
             }
         }
 
-        public void SaveGame()
+        public string SaveGame(string fileName = null)
         {
-            currentSaveData = new BaseSaveData
+            var currentSaveData = new BaseSaveData
             {
                 buildings = BuildingManager.Buildings.Select(x => x.buildingState).ToList()
             };
 
-            _saveSystem.Save(currentSaveData);
+            var filePath = _saveSystem.Save(currentSaveData, fileName);
             EventSystem.Instance.InvokeSaveGame(currentSaveData);
+            return filePath;
         }
 
-        public void LoadGame()
+        public void LoadGame(string fileName)
         {
-            currentSaveData = _saveSystem.Load();
+            var currentSaveData = _saveSystem.Load(fileName);
+            EventSystem.Instance.InvokeLoadGame(currentSaveData);
+        }
+
+        public void LoadLatestGame()
+        {
+            var currentSaveData = _saveSystem.LoadLatest();
             EventSystem.Instance.InvokeLoadGame(currentSaveData);
         }
     }
