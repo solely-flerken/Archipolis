@@ -48,7 +48,7 @@ namespace UI
             _isActive.Bind(viewModel.IsActive, nameof(Toggle.value), BindingMode.TwoWay);
         }
 
-        private void HideUIOnModeChange(Mode newMode)
+        private void HideUIOnModeChange(Mode currentMode, Mode newMode)
         {
             _root.style.display = DisplayStyle.None;
         }

@@ -41,7 +41,7 @@ namespace Events
         public event Action<string> OnPlaceBuildingUI;
 
         // State
-        public event Action<Mode> OnModeChanged;
+        public event Action<Mode, Mode> OnModeChanged;
 
         // Save
         public event Action<BaseSaveData> OnSaveGame;
@@ -132,9 +132,9 @@ namespace Events
             OnPlaceBuildingUI?.Invoke(identifier);
         }
 
-        public void InvokeModeChanged(Mode newMode)
+        public void InvokeModeChanged(Mode currentMode, Mode newMode)
         {
-            OnModeChanged?.Invoke(newMode);
+            OnModeChanged?.Invoke(currentMode, newMode);
         }
 
         public void InvokeSaveGame(BaseSaveData saveData)

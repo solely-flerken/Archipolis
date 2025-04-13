@@ -33,8 +33,9 @@ namespace State
 
         public void SetMode(Mode newMode)
         {
+            var currentMode = ModeState;
             ModeState = newMode;
-            EventSystem.Instance.InvokeModeChanged(ModeState);
+            EventSystem.Instance.InvokeModeChanged(currentMode, ModeState);
         }
     }
 }
