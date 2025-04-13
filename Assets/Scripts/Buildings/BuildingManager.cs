@@ -310,7 +310,7 @@ namespace Buildings
             }
 
             foreach (var cell in HexGridManager.Instance.HexGrid.hexCells.Where(cell =>
-                         cell.OccupiedBy == _selectedObject))
+                         cell.OccupiedBy == building))
             {
                 cell.OccupiedBy = null;
                 cell.Preview = false;
