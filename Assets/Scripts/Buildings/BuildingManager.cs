@@ -178,6 +178,9 @@ namespace Buildings
                 cell.OccupiedBy = obj;
             }
 
+            var buildingComponent = obj.GetComponent<Building>();
+            Buildings.Add(buildingComponent);
+
             ResetSelection();
             // TODO: Only change to building again if the building placed wasn't a new one
             ModeStateManager.Instance.SetMode(Mode.Building);
@@ -242,13 +245,10 @@ namespace Buildings
                 case Mode.Placing:
                     if (_selectedBuilding == null) return;
 
-                    // TODO: Refactor this
-                    HexGridManager.Instance.HexGrid.hexCells.ForEach(x => x.Preview = false);
-
                     // Checks if the building is newly created and wasn't placed yet. If this is the case we delete the building on cancel.
                     if (!HexGridManager.Instance.HexGrid.hexCells.Exists(cell => cell.OccupiedBy == _selectedObject))
                     {
-                        Destroy(_selectedObject);
+                        DeleteBuilding(_selectedObject);
                     }
 
                     _selectedBuilding.buildingState.origin = _previousPosition;
@@ -293,11 +293,6 @@ namespace Buildings
             buildingComponent.buildingState.blueprintIdentifier = blueprint.identifier;
             buildingComponent.Initialize(blueprint, buildingState);
 
-            if (!Buildings.Contains(buildingComponent))
-            {
-                Buildings.Add(buildingComponent);
-            }
-
             return newBuilding;
         }
 
@@ -309,11 +304,15 @@ namespace Buildings
                 Buildings.Remove(buildingComponent);
             }
 
+            foreach (var cell in HexGridManager.Instance.HexGrid.hexCells.Where(cell => cell.Preview))
+            {
+                cell.Preview = false;
+            }
+
             foreach (var cell in HexGridManager.Instance.HexGrid.hexCells.Where(cell =>
                          cell.OccupiedBy == building))
             {
                 cell.OccupiedBy = null;
-                cell.Preview = false;
             }
 
             Destroy(building);
