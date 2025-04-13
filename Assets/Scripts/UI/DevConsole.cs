@@ -1,5 +1,5 @@
-﻿using Buildings;
-using Events;
+﻿using Events;
+using Save;
 using State;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -93,6 +93,14 @@ namespace UI
                     break;
                 case "/mode":
                     LogMessage($"Current mode: {ModeStateManager.Instance.ModeState}");
+                    break;
+                case "/save":
+                    SaveManager.Instance.SaveGame();
+                    LogMessage("Saved the game");
+                    break;
+                case "/load":
+                    SaveManager.Instance.LoadGame();
+                    LogMessage("Loaded the game");
                     break;
                 default:
                     LogMessage("Unknown command: " + command);

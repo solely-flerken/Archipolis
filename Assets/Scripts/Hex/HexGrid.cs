@@ -117,6 +117,12 @@ namespace Hex
             return new HexCoordinate(q, r);
         }
 
+        public Vector3 HexToWorld(HexCoordinate coordinate)
+        {
+            var cell = GetCell(coordinate);
+            return cell.gameObject.transform.position;
+        }
+        
         public HexCell GetNearestHexCell(Vector3 worldPosition)
         {
             var closestDistance = Mathf.Infinity;

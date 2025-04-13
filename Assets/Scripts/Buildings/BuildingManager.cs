@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Events;
 using Hex;
 using Input;
+using Save;
 using State;
 using UI;
+using Unity.VisualScripting;
 using UnityEngine;
 using Utils;
 
@@ -13,6 +16,8 @@ namespace Buildings
     public class BuildingManager : MonoBehaviour
     {
         public static BuildingManager Instance { get; private set; }
+
+        public static List<Building> Buildings { get; private set; } = new();
 
         private GameObject _selectedObject;
         private Building _selectedBuilding;
@@ -41,6 +46,7 @@ namespace Buildings
             EventSystem.Instance.OnBuildingPlaced += HandleBuildingPlaced;
             EventSystem.Instance.OnCancel += HandleCancel;
             EventSystem.Instance.OnKeyR += HandleBuildingRotate;
+            EventSystem.Instance.OnLoadGame += HandleLoadGame;
         }
 
         private void Update()
@@ -63,7 +69,8 @@ namespace Buildings
             // Set preview of occupied cells
             HexGridManager.Instance.HexGrid.hexCells.ForEach(x => x.Preview = false);
             var adjacentHexCells =
-                HexGridManager.Instance.HexGrid.GetTissue(cell.HexCoordinate, _selectedBuilding.Footprint);
+                HexGridManager.Instance.HexGrid.GetTissue(cell.HexCoordinate,
+                    _selectedBuilding.buildingState.footprint);
             adjacentHexCells.Where(x => x is not null).ToList().ForEach(x => x.Preview = true);
         }
 
@@ -74,6 +81,7 @@ namespace Buildings
             EventSystem.Instance.OnBuildingPlaced -= HandleBuildingPlaced;
             EventSystem.Instance.OnCancel -= HandleCancel;
             EventSystem.Instance.OnKeyR -= HandleBuildingRotate;
+            EventSystem.Instance.OnLoadGame -= HandleLoadGame;
         }
 
         #region Event subscriptions
@@ -87,17 +95,7 @@ namespace Buildings
             {
                 // Delete building
                 case Mode.Bulldozing:
-                    ConfirmationDialog.Show("Are you sure to delete this building?", () =>
-                    {
-                        foreach (var cell in HexGridManager.Instance.HexGrid.hexCells.Where(cell =>
-                                     cell.OccupiedBy == _selectedObject))
-                        {
-                            cell.OccupiedBy = null;
-                            cell.Preview = false;
-                        }
-
-                        Destroy(obj);
-                    });
+                    ConfirmationDialog.Show("Are you sure to delete this building?", () => { DeleteBuilding(obj); });
                     break;
                 // Pick building up or place building
                 case Mode.Building:
@@ -117,7 +115,7 @@ namespace Buildings
                     var nearestHexCell =
                         HexGridManager.Instance.HexGrid.GetNearestHexCell(_selectedObject.transform.position);
 
-                    _selectedBuilding.Origin = nearestHexCell.HexCoordinate;
+                    _selectedBuilding.buildingState.origin = nearestHexCell.HexCoordinate;
 
                     if (!IsPlacementValid(_selectedBuilding)) return;
 
@@ -137,20 +135,18 @@ namespace Buildings
         // Called on UI event when placing a new building.
         private void HandleCreateBuilding(string identifier)
         {
-            var building = BuildingDatabase.GetBuildingByID(identifier);
+            var buildingBlueprint = BuildingDatabase.GetBuildingByID(identifier);
 
-            if (building != null && !building.prefab)
+            if (buildingBlueprint != null && !buildingBlueprint.prefab)
             {
                 return;
             }
 
             var position = MouseUtils.MouseToWorldPosition(Vector3.up, CameraController.Camera);
-
-            // Create new building
-            var newBuilding = Instantiate(building.prefab, position, Quaternion.identity);
-            var buildingComponent = newBuilding.GetComponent<Building>();
-            buildingComponent.buildingData = building;
             
+            // TODO: Refactor
+            var newBuilding = CreateBuildingFromBlueprint(buildingBlueprint, position);
+
             ModeStateManager.Instance.SetMode(Mode.Building);
             EventSystem.Instance.InvokeBuildingClick(newBuilding);
         }
@@ -165,7 +161,8 @@ namespace Buildings
 
             // Occupy new cells
             var newTissue =
-                HexGridManager.Instance.HexGrid.GetTissue(_selectedBuilding.Origin, _selectedBuilding.Footprint);
+                HexGridManager.Instance.HexGrid.GetTissue(_selectedBuilding.buildingState.origin,
+                    _selectedBuilding.buildingState.footprint);
             foreach (var cell in newTissue)
             {
                 cell.OccupiedBy = obj;
@@ -185,15 +182,15 @@ namespace Buildings
 
                     // TODO: Refactor this
                     HexGridManager.Instance.HexGrid.hexCells.ForEach(x => x.Preview = false);
-                    
+
                     // Checks if the building is newly created and wasn't placed yet. If this is the case we delete the building on cancel.
                     if (!HexGridManager.Instance.HexGrid.hexCells.Exists(cell => cell.OccupiedBy == _selectedObject))
                     {
                         Destroy(_selectedObject);
                     }
 
-                    _selectedBuilding.Origin = _previousPosition;
-                    var cell = HexGridManager.Instance.HexGrid.GetCell(_selectedBuilding.Origin);
+                    _selectedBuilding.buildingState.origin = _previousPosition;
+                    var cell = HexGridManager.Instance.HexGrid.GetCell(_selectedBuilding.buildingState.origin);
                     _selectedObject.transform.position = cell.transform.position;
 
                     // We need this here since it won't be called in update(), because we set _selectedObject to null
@@ -220,6 +217,24 @@ namespace Buildings
             _selectedBuilding.RotateFootprint();
         }
 
+        private void HandleLoadGame(BaseSaveData saveData)
+        {
+            // TODO: Refactor this
+            foreach (var buildingState in saveData.buildings)
+            {
+                var position = HexGridManager.Instance.HexGrid.HexToWorld(buildingState.origin);
+                var blueprint = BuildingDatabase.GetBuildingByID(buildingState.blueprintIdentifier);
+                var createBuilding = CreateBuildingFromBlueprint(blueprint, position, buildingState);
+
+                var newTissue =
+                    HexGridManager.Instance.HexGrid.GetTissue(buildingState.origin, buildingState.footprint);
+                foreach (var cell in newTissue)
+                {
+                    cell.OccupiedBy = createBuilding;
+                }
+            }
+        }
+
         #endregion
 
         #region Utility functions
@@ -241,12 +256,46 @@ namespace Buildings
             if (cell is null) return false;
 
             var adjacentHexCells =
-                HexGridManager.Instance.HexGrid.GetTissue(cell.HexCoordinate, building.Footprint);
+                HexGridManager.Instance.HexGrid.GetTissue(cell.HexCoordinate, building.buildingState.footprint);
 
             var isInvalidPlacement = adjacentHexCells.Any(adjacentCell =>
                 !adjacentCell || (adjacentCell.Occupied && adjacentCell.OccupiedBy != building.gameObject));
 
             return !isInvalidPlacement;
+        }
+
+        private static GameObject CreateBuildingFromBlueprint(BuildingData blueprint, Vector3 position, BuildingState buildingState = null)
+        {
+            // TODO: Refactor
+            var newBuilding = Instantiate(blueprint.prefab, position, Quaternion.identity);
+            var buildingComponent = newBuilding.GetOrAddComponent<Building>();
+            buildingComponent.buildingState.blueprintIdentifier = blueprint.identifier;
+            buildingComponent.Initialize(blueprint, buildingState);
+
+            if (!Buildings.Contains(buildingComponent))
+            {
+                Buildings.Add(buildingComponent);
+            }
+
+            return newBuilding;
+        }
+
+        private void DeleteBuilding(GameObject building)
+        {
+            var buildingComponent = building.GetComponent<Building>();
+            if (Buildings.Contains(buildingComponent))
+            {
+                Buildings.Remove(buildingComponent);
+            }
+
+            foreach (var cell in HexGridManager.Instance.HexGrid.hexCells.Where(cell =>
+                         cell.OccupiedBy == _selectedObject))
+            {
+                cell.OccupiedBy = null;
+                cell.Preview = false;
+            }
+
+            Destroy(building);
         }
 
         #endregion

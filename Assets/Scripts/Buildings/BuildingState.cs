@@ -1,4 +1,5 @@
 ﻿using System;
+using Hex;
 using UI;
 
 namespace Buildings
@@ -7,8 +8,19 @@ namespace Buildings
     public class BuildingState
     {
         public string identifier = Guid.NewGuid().ToString();
+        public string blueprintIdentifier;
         public int currentPopulation;
         public bool isActive;
+        
+        public HexCoordinate origin;
+        /// <summary>
+        /// Defines the footprint of the building.
+        /// Footprint is build by calculating adjacent hex cells with the offsets.
+        /// </summary>
+        public HexCoordinate[] footprint;
+        
+        // Rotation in 60-degree increments
+        public int yaw; 
     }
 
     public class ViewModelBuildingState

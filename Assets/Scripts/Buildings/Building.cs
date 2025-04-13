@@ -6,44 +6,49 @@ namespace Buildings
     [RequireComponent(typeof(MeshRenderer))]
     public class Building : MonoBehaviour, IClickable
     {
-        public BuildingData buildingData;
         public BuildingState buildingState;
+        private BuildingData BuildingData => BuildingDatabase.GetBuildingByID(buildingState.blueprintIdentifier);
 
-        public HexCoordinate Origin;
-
-        /// <summary>
-        /// Defines the footprint of the building.
-        /// Footprint is build by calculating adjacent hex cells with the offsets.
-        /// </summary>
-        public HexCoordinate[] Footprint;
-
-        private static readonly int OverlayColor = Shader.PropertyToID("_OverlayColor");
-
-        private int _yaw; // Rotation in 60-degree increments
         private MeshRenderer _meshRenderer;
         private MaterialPropertyBlock _propertyBlock;
 
-        private void Start()
+        private static readonly int OverlayColor = Shader.PropertyToID("_OverlayColor");
+
+        public void Initialize(BuildingData blueprint, BuildingState state = null)
         {
-            // TODO: Refactor this (need to change this when we implement loading/saving building data)
-            buildingState = new BuildingState();
-            
+            // TODO: Refactor
+            buildingState = state ?? new BuildingState();
+            if (state == null)
+            {
+                buildingState.blueprintIdentifier = blueprint.identifier;
+                buildingState.footprint = blueprint.footprint;
+                buildingState.yaw = blueprint.initialYaw;
+            }
+
+            if (BuildingData != null)
+            {
+                transform.rotation = Quaternion.Euler(0, BuildingData.initialYaw, 0);
+                transform.rotation = Quaternion.Euler(0, BuildingData.initialYaw + buildingState.yaw * 60, 0);
+                buildingState.footprint = BuildingData.footprint;
+                for (var i = 0; i < buildingState.yaw; i++)
+                {
+                    RotateFootprint();
+                }
+            }
+
             _meshRenderer = GetComponent<MeshRenderer>();
             _propertyBlock = new MaterialPropertyBlock();
-
-            transform.rotation = Quaternion.Euler(0, buildingData.initialYaw, 0);
-            Footprint = buildingData.footprint;
         }
 
         public void RotateBuilding()
         {
-            _yaw = (_yaw + 1) % 6; // 6 rotations: 0, 60, 120, 180, 240, 300 degrees
-            transform.rotation = Quaternion.Euler(0, buildingData.initialYaw + _yaw * 60, 0);
+            buildingState.yaw = (buildingState.yaw + 1) % 6; // 6 rotations: 0, 60, 120, 180, 240, 300 degrees
+            transform.rotation = Quaternion.Euler(0, BuildingData.initialYaw + buildingState.yaw * 60, 0);
         }
 
         public void RotateFootprint()
         {
-            Footprint = HexGrid.RotateHexesClockwise(new HexCoordinate(0, 0), Footprint);
+            buildingState.footprint = HexGrid.RotateHexesClockwise(new HexCoordinate(0, 0), buildingState.footprint);
         }
 
         public void SetColor(Color color)

@@ -1,5 +1,6 @@
 ﻿using System;
 using Buildings;
+using Save;
 using State;
 using UnityEngine;
 using Utils;
@@ -41,6 +42,10 @@ namespace Events
 
         // State
         public event Action<Mode> OnModeChanged;
+
+        // Save
+        public event Action<BaseSaveData> OnSaveGame;
+        public event Action<BaseSaveData> OnLoadGame;
 
         // Custom
         public event Action<GameObject> OnClickableClick;
@@ -130,6 +135,16 @@ namespace Events
         public void InvokeModeChanged(Mode newMode)
         {
             OnModeChanged?.Invoke(newMode);
+        }
+
+        public void InvokeSaveGame(BaseSaveData saveData)
+        {
+            OnSaveGame?.Invoke(saveData);
+        }
+
+        public void InvokeLoadGame(BaseSaveData saveData)
+        {
+            OnLoadGame?.Invoke(saveData);
         }
     }
 }
