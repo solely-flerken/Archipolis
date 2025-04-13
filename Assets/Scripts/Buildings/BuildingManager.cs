@@ -47,6 +47,15 @@ namespace Buildings
             EventSystem.Instance.OnCancel += HandleCancel;
             EventSystem.Instance.OnKeyR += HandleBuildingRotate;
             EventSystem.Instance.OnLoadGame += HandleLoadGame;
+            EventSystem.Instance.OnModeChanged += HandleModeChange;
+        }
+
+        private void HandleModeChange(Mode currentMode, Mode newMode)
+        {
+            if (currentMode == Mode.Placing)
+            {
+                CancelAllActions(currentMode);
+            }
         }
 
         private void Update()
@@ -82,6 +91,7 @@ namespace Buildings
             EventSystem.Instance.OnCancel -= HandleCancel;
             EventSystem.Instance.OnKeyR -= HandleBuildingRotate;
             EventSystem.Instance.OnLoadGame -= HandleLoadGame;
+            EventSystem.Instance.OnModeChanged -= HandleModeChange;
         }
 
         #region Event subscriptions
@@ -143,7 +153,7 @@ namespace Buildings
             }
 
             var position = MouseUtils.MouseToWorldPosition(Vector3.up, CameraController.Camera);
-            
+
             // TODO: Refactor
             var newBuilding = CreateBuildingFromBlueprint(buildingBlueprint, position);
 
@@ -175,37 +185,7 @@ namespace Buildings
 
         private void HandleCancel()
         {
-            switch (ModeStateManager.Instance.ModeState)
-            {
-                case Mode.Placing:
-                    if (_selectedBuilding == null) return;
-
-                    // TODO: Refactor this
-                    HexGridManager.Instance.HexGrid.hexCells.ForEach(x => x.Preview = false);
-
-                    // Checks if the building is newly created and wasn't placed yet. If this is the case we delete the building on cancel.
-                    if (!HexGridManager.Instance.HexGrid.hexCells.Exists(cell => cell.OccupiedBy == _selectedObject))
-                    {
-                        Destroy(_selectedObject);
-                    }
-
-                    _selectedBuilding.buildingState.origin = _previousPosition;
-                    var cell = HexGridManager.Instance.HexGrid.GetCell(_selectedBuilding.buildingState.origin);
-                    _selectedObject.transform.position = cell.transform.position;
-
-                    // We need this here since it won't be called in update(), because we set _selectedObject to null
-                    var isValidPlacement = IsPlacementValid(_selectedBuilding);
-                    ColorBasedOnValidity(isValidPlacement, _selectedBuilding);
-                    break;
-                case Mode.Building:
-                case Mode.Idle:
-                case Mode.Bulldozing:
-                default:
-                    // Do nothing
-                    break;
-            }
-
-            ResetSelection();
+            CancelAllActions(ModeStateManager.Instance.ModeState);
             ModeStateManager.Instance.SetMode(Mode.Idle);
         }
 
@@ -250,6 +230,41 @@ namespace Buildings
             building.SetColor(isValid ? BaseOverlay : InvalidOverlay);
         }
 
+        private void CancelAllActions(Mode mode)
+        {
+            switch (mode)
+            {
+                case Mode.Placing:
+                    if (_selectedBuilding == null) return;
+
+                    // TODO: Refactor this
+                    HexGridManager.Instance.HexGrid.hexCells.ForEach(x => x.Preview = false);
+
+                    // Checks if the building is newly created and wasn't placed yet. If this is the case we delete the building on cancel.
+                    if (!HexGridManager.Instance.HexGrid.hexCells.Exists(cell => cell.OccupiedBy == _selectedObject))
+                    {
+                        Destroy(_selectedObject);
+                    }
+
+                    _selectedBuilding.buildingState.origin = _previousPosition;
+                    var cell = HexGridManager.Instance.HexGrid.GetCell(_selectedBuilding.buildingState.origin);
+                    _selectedObject.transform.position = cell.transform.position;
+
+                    // We need this here since it won't be called in update(), because we set _selectedObject to null
+                    var isValidPlacement = IsPlacementValid(_selectedBuilding);
+                    ColorBasedOnValidity(isValidPlacement, _selectedBuilding);
+                    break;
+                case Mode.Building:
+                case Mode.Idle:
+                case Mode.Bulldozing:
+                default:
+                    // Do nothing
+                    break;
+            }
+
+            ResetSelection();
+        }
+
         private static bool IsPlacementValid(Building building)
         {
             var cell = HexGridManager.Instance.HexGrid.GetNearestHexCell(building.transform.position);
@@ -264,7 +279,8 @@ namespace Buildings
             return !isInvalidPlacement;
         }
 
-        private static GameObject CreateBuildingFromBlueprint(BuildingData blueprint, Vector3 position, BuildingState buildingState = null)
+        private static GameObject CreateBuildingFromBlueprint(BuildingData blueprint, Vector3 position,
+            BuildingState buildingState = null)
         {
             // TODO: Refactor
             var newBuilding = Instantiate(blueprint.prefab, position, Quaternion.identity);
