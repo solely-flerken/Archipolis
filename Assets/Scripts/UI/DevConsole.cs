@@ -1,4 +1,5 @@
-﻿using Events;
+﻿using System;
+using Events;
 using Save;
 using State;
 using UnityEngine;
@@ -10,7 +11,7 @@ namespace UI
     {
         private static DevConsole _instance;
         private static bool _isEnabled;
-        
+
         private static VisualElement _root;
         private static ScrollView _scrollView;
         private static TextField _cmdInput;
@@ -36,10 +37,10 @@ namespace UI
             _cmdConfirm = _root.Q<Button>("cmdConfirm");
 
             _root.style.display = DisplayStyle.None;
-            
+
             _cmdInput.RegisterCallback<KeyDownEvent>(OnCmdInputKeyDown, TrickleDown.TrickleDown);
             _cmdConfirm.clicked += OnCommandSubmit;
-            
+
             EventSystem.Instance.OnKeyF3 += ToggleIsEnabled;
         }
 
@@ -47,7 +48,7 @@ namespace UI
         {
             _cmdInput.UnregisterCallback<KeyDownEvent>(OnCmdInputKeyDown, TrickleDown.TrickleDown);
             _cmdConfirm.clicked -= OnCommandSubmit;
-            
+
             EventSystem.Instance.OnKeyF3 -= ToggleIsEnabled;
         }
 
@@ -59,13 +60,13 @@ namespace UI
                 evt.StopPropagation();
             }
         }
-        
+
         private void OnCommandSubmit()
         {
             var command = _cmdInput.value;
-            
+
             if (string.IsNullOrEmpty(command)) return;
-            
+
             ExecuteCommand(command);
             _cmdInput.value = "";
         }
@@ -75,32 +76,73 @@ namespace UI
             _isEnabled = !_isEnabled;
             _root.style.display = _isEnabled ? DisplayStyle.Flex : DisplayStyle.None;
         }
-        
+
         private void ExecuteCommand(string command)
         {
-            switch (command.ToLower())
+            var args = command.ToLower().Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var mainCommand = args[0];
+            var parameter = args.Length > 1 ? args[1] : null;
+
+            switch (mainCommand)
             {
                 case "/clear":
                     ClearConsole();
                     break;
-                case "/setmode bulldoze":
-                    LogMessage("Switched to Bulldoze mode");
-                    ModeStateManager.Instance.SetMode(Mode.Bulldozing);
-                    break;
-                case "/setmode idle":
-                    LogMessage("Switched to Idle mode");
-                    ModeStateManager.Instance.SetMode(Mode.Idle);
+                case "/setmode":
+                    if (parameter != null)
+                    {
+                        switch (parameter)
+                        {
+                            case "bulldoze":
+                                LogMessage("Switched to Bulldoze mode");
+                                ModeStateManager.Instance.SetMode(Mode.Bulldozing);
+                                break;
+                            case "building":
+                                LogMessage("Switched to Building mode");
+                                ModeStateManager.Instance.SetMode(Mode.Bulldozing);
+                                break;
+                            case "idle":
+                                LogMessage("Switched to Idle mode");
+                                ModeStateManager.Instance.SetMode(Mode.Idle);
+                                break;
+                            default:
+                                LogMessage("Unknown mode: " + parameter);
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        LogMessage("Usage: /setmode [mode]");
+                    }
+
                     break;
                 case "/mode":
                     LogMessage($"Current mode: {ModeStateManager.Instance.ModeState}");
                     break;
                 case "/save":
-                    SaveManager.Instance.SaveGame();
-                    LogMessage("Saved the game");
+                    var filePath = SaveManager.Instance.SaveGame(parameter);
+                    LogMessage(filePath);
                     break;
                 case "/load":
-                    SaveManager.Instance.LoadGame();
-                    LogMessage("Loaded the game");
+                    if (parameter != null)
+                    {
+                        switch (parameter)
+                        {
+                            case "latest":
+                                SaveManager.Instance.LoadLatestGame();
+                                LogMessage("Loaded latest save");
+                                break;
+                            default:
+                                SaveManager.Instance.LoadGame(parameter);
+                                LogMessage($"Loaded save: {parameter}");
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        LogMessage("Usage: /load [fileName]");
+                    }
+
                     break;
                 default:
                     LogMessage("Unknown command: " + command);
