@@ -243,8 +243,11 @@ namespace Buildings
                     if (!HexGridManager.Instance.HexGrid.hexCells.Exists(cell => cell.OccupiedBy == _selectedObject))
                     {
                         DeleteBuilding(_selectedObject);
+                        return;
                     }
 
+                    HexGridManager.Instance.HexGrid.hexCells.ForEach(x => x.Preview = false);
+                    
                     _selectedBuilding.buildingData.origin = _previousPosition;
                     var cell = HexGridManager.Instance.HexGrid.GetCell(_selectedBuilding.buildingData.origin);
                     _selectedObject.transform.position = cell.transform.position;
