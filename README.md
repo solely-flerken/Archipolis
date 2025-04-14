@@ -2,6 +2,9 @@
 Your game revolves around managing a small Greek settlement, focusing on building up the economy,
 producing essential goods, and expanding the city.
 
+### Game title ideas
+- Archipolis
+
 ### Core Gameplay Mechanics
 1. **Resource Management**\
    Players need to gather and manage three main categories of resources:
