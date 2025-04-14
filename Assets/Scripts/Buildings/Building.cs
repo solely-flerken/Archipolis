@@ -27,7 +27,6 @@ namespace Buildings
 
             if (BuildingData != null)
             {
-                transform.rotation = Quaternion.Euler(0, BuildingData.initialYaw, 0);
                 transform.rotation = Quaternion.Euler(0, BuildingData.initialYaw + buildingState.yaw * 60, 0);
                 buildingState.footprint = BuildingData.footprint;
                 for (var i = 0; i < buildingState.yaw; i++)
