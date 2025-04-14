@@ -42,7 +42,7 @@ namespace Buildings
         public void RotateBuilding()
         {
             buildingState.yaw = (buildingState.yaw + 1) % 6; // 6 rotations: 0, 60, 120, 180, 240, 300 degrees
-            transform.rotation = Quaternion.Euler(0, BuildingData.initialYaw + buildingState.yaw * 60, 0);
+            transform.rotation = Quaternion.Euler(0, buildingState.yaw * 60, 0);
         }
 
         public void RotateFootprint()

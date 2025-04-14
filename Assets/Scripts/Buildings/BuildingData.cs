@@ -10,7 +10,6 @@ namespace Buildings
         public string identifier = Guid.NewGuid().ToString();
         public string buildingName;
         public GameObject prefab;
-        public int initialYaw;
         public HexCoordinate[] footprint = { new(0, 0) };
     }
 }
