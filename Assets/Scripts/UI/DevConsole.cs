@@ -144,6 +144,18 @@ namespace UI
                     }
 
                     break;
+                case "/delete":
+                    if (parameter != null)
+                    {
+                        SaveManager.Instance.DeleteGame(parameter);
+                        LogMessage($"Deleted save: {parameter}");
+                    }
+                    else
+                    {
+                        LogMessage("Usage: /delete [fileName]");
+                    }
+
+                    break;
                 default:
                     LogMessage("Unknown command: " + command);
                     break;

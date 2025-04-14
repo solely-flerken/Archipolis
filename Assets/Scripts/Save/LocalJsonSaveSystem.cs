@@ -60,6 +60,24 @@ namespace Save
             return Load(latestSaveFile);
         }
 
+        public bool Delete(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+            {
+                return false;
+            }
+
+            var savePath = ToSavePath(fileName);
+            
+            if (!File.Exists(savePath))
+            {
+                return false;
+            }
+            
+            File.Delete(savePath);
+            return true;
+        }
+
         private string[] GetAllSaveFiles()
         {
             if (!Directory.Exists(SaveDirectory))

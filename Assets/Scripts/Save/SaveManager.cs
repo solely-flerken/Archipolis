@@ -50,5 +50,10 @@ namespace Save
             var currentSaveData = _saveSystem.LoadLatest();
             EventSystem.Instance.InvokeLoadGame(currentSaveData);
         }
+
+        public void DeleteGame(string parameter)
+        {
+            _saveSystem.Delete(parameter);
+        }
     }
 }
