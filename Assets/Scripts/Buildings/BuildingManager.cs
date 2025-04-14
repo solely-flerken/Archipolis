@@ -147,15 +147,8 @@ namespace Buildings
         {
             var buildingBlueprint = BuildingDatabase.GetBuildingByID(identifier);
 
-            if (buildingBlueprint != null && !buildingBlueprint.prefab)
-            {
-                return;
-            }
-
-            var position = MouseUtils.MouseToWorldPosition(Vector3.up, CameraController.Camera);
-
             // TODO: Refactor
-            var newBuilding = CreateBuildingFromBlueprint(buildingBlueprint, position);
+            var newBuilding = CreateBuilding(buildingBlueprint);
 
             ModeStateManager.Instance.SetMode(Mode.Building);
             EventSystem.Instance.InvokeBuildingClick(newBuilding);
@@ -209,20 +202,18 @@ namespace Buildings
             Buildings.Clear();
 
             // TODO: Refactor this
-            foreach (var buildingState in saveData.buildings)
+            foreach (var buildingData in saveData.buildings)
             {
-                var position = HexGridManager.Instance.HexGrid.HexToWorld(buildingState.origin);
-                var blueprint = BuildingDatabase.GetBuildingByID(buildingState.blueprintIdentifier);
-                var createBuilding = CreateBuildingFromBlueprint(blueprint, position, buildingState);
+                var createdBuilding = CreateBuilding(null, buildingData);
 
                 var newTissue =
-                    HexGridManager.Instance.HexGrid.GetTissue(buildingState.origin, buildingState.footprint);
+                    HexGridManager.Instance.HexGrid.GetTissue(buildingData.origin, buildingData.footprint);
                 foreach (var cell in newTissue)
                 {
-                    cell.OccupiedBy = createBuilding;
+                    cell.OccupiedBy = createdBuilding;
                 }
 
-                Buildings.Add(createBuilding.GetComponent<Building>());
+                Buildings.Add(createdBuilding.GetComponent<Building>());
             }
         }
 
@@ -287,13 +278,23 @@ namespace Buildings
             return !isInvalidPlacement;
         }
 
-        private static GameObject CreateBuildingFromBlueprint(BuildingBlueprint blueprint, Vector3 position,
-            BuildingData buildingData = null)
+        private static GameObject CreateBuilding(BuildingBlueprint blueprint, BuildingData buildingData = null)
         {
-            // TODO: Refactor
-            var newBuilding = Instantiate(blueprint.prefab, position, Quaternion.identity);
+            Vector3 position;
+            var buildingBlueprint = blueprint;
+
+            if (buildingData != null)
+            {
+                position = HexGridManager.Instance.HexGrid.HexToWorld(buildingData.origin);
+                buildingBlueprint = BuildingDatabase.GetBuildingByID(buildingData.blueprintIdentifier);
+            }
+            else
+            {
+                position = MouseUtils.MouseToWorldPosition(Vector3.up, CameraController.Camera);
+            }
+
+            var newBuilding = Instantiate(buildingBlueprint.prefab, position, Quaternion.identity);
             var buildingComponent = newBuilding.GetOrAddComponent<Building>();
-            buildingComponent.buildingData.blueprintIdentifier = blueprint.identifier;
             buildingComponent.Initialize(blueprint, buildingData);
 
             return newBuilding;
