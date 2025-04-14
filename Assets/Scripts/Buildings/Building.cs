@@ -7,7 +7,6 @@ namespace Buildings
     public class Building : MonoBehaviour, IClickable
     {
         public BuildingState buildingState;
-        private BuildingData BuildingData => BuildingDatabase.GetBuildingByID(buildingState.blueprintIdentifier);
 
         private MeshRenderer _meshRenderer;
         private MaterialPropertyBlock _propertyBlock;
@@ -16,23 +15,20 @@ namespace Buildings
 
         public void Initialize(BuildingData blueprint, BuildingState state = null)
         {
-            // TODO: Refactor
-            buildingState = state ?? new BuildingState();
-            if (state == null)
+            if (state != null)
             {
-                buildingState.blueprintIdentifier = blueprint.identifier;
-                buildingState.footprint = blueprint.footprint;
-                buildingState.yaw = blueprint.initialYaw;
+                // Initialize from save data
+                buildingState = state;
+                transform.rotation = Quaternion.Euler(0, buildingState.yaw * 60, 0);
             }
-
-            if (BuildingData != null)
+            else
             {
-                transform.rotation = Quaternion.Euler(0, BuildingData.initialYaw + buildingState.yaw * 60, 0);
-                buildingState.footprint = BuildingData.footprint;
-                for (var i = 0; i < buildingState.yaw; i++)
+                // Initialize from blueprint
+                buildingState = new BuildingState
                 {
-                    RotateFootprint();
-                }
+                    blueprintIdentifier = blueprint.identifier,
+                    footprint = blueprint.footprint
+                };
             }
 
             _meshRenderer = GetComponent<MeshRenderer>();
