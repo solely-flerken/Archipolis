@@ -79,7 +79,7 @@ namespace Buildings
             HexGridManager.Instance.HexGrid.hexCells.ForEach(x => x.Preview = false);
             var adjacentHexCells =
                 HexGridManager.Instance.HexGrid.GetTissue(cell.HexCoordinate,
-                    _selectedBuilding.buildingState.footprint);
+                    _selectedBuilding.buildingData.footprint);
             adjacentHexCells.Where(x => x is not null).ToList().ForEach(x => x.Preview = true);
         }
 
@@ -125,7 +125,7 @@ namespace Buildings
                     var nearestHexCell =
                         HexGridManager.Instance.HexGrid.GetNearestHexCell(_selectedObject.transform.position);
 
-                    _selectedBuilding.buildingState.origin = nearestHexCell.HexCoordinate;
+                    _selectedBuilding.buildingData.origin = nearestHexCell.HexCoordinate;
 
                     if (!IsPlacementValid(_selectedBuilding)) return;
 
@@ -171,8 +171,8 @@ namespace Buildings
 
             // Occupy new cells
             var newTissue =
-                HexGridManager.Instance.HexGrid.GetTissue(_selectedBuilding.buildingState.origin,
-                    _selectedBuilding.buildingState.footprint);
+                HexGridManager.Instance.HexGrid.GetTissue(_selectedBuilding.buildingData.origin,
+                    _selectedBuilding.buildingData.footprint);
             foreach (var cell in newTissue)
             {
                 cell.OccupiedBy = obj;
@@ -254,8 +254,8 @@ namespace Buildings
                         DeleteBuilding(_selectedObject);
                     }
 
-                    _selectedBuilding.buildingState.origin = _previousPosition;
-                    var cell = HexGridManager.Instance.HexGrid.GetCell(_selectedBuilding.buildingState.origin);
+                    _selectedBuilding.buildingData.origin = _previousPosition;
+                    var cell = HexGridManager.Instance.HexGrid.GetCell(_selectedBuilding.buildingData.origin);
                     _selectedObject.transform.position = cell.transform.position;
 
                     // We need this here since it won't be called in update(), because we set _selectedObject to null
@@ -279,7 +279,7 @@ namespace Buildings
             if (cell is null) return false;
 
             var adjacentHexCells =
-                HexGridManager.Instance.HexGrid.GetTissue(cell.HexCoordinate, building.buildingState.footprint);
+                HexGridManager.Instance.HexGrid.GetTissue(cell.HexCoordinate, building.buildingData.footprint);
 
             var isInvalidPlacement = adjacentHexCells.Any(adjacentCell =>
                 !adjacentCell || (adjacentCell.Occupied && adjacentCell.OccupiedBy != building.gameObject));
@@ -287,14 +287,14 @@ namespace Buildings
             return !isInvalidPlacement;
         }
 
-        private static GameObject CreateBuildingFromBlueprint(BuildingData blueprint, Vector3 position,
-            BuildingState buildingState = null)
+        private static GameObject CreateBuildingFromBlueprint(BuildingBlueprint blueprint, Vector3 position,
+            BuildingData buildingData = null)
         {
             // TODO: Refactor
             var newBuilding = Instantiate(blueprint.prefab, position, Quaternion.identity);
             var buildingComponent = newBuilding.GetOrAddComponent<Building>();
-            buildingComponent.buildingState.blueprintIdentifier = blueprint.identifier;
-            buildingComponent.Initialize(blueprint, buildingState);
+            buildingComponent.buildingData.blueprintIdentifier = blueprint.identifier;
+            buildingComponent.Initialize(blueprint, buildingData);
 
             return newBuilding;
         }

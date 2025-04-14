@@ -7,6 +7,6 @@ namespace Save
     [Serializable]
     public class BaseSaveData
     {
-        public List<BuildingState> buildings = new();
+        public List<BuildingData> buildings = new();
     }
 }

@@ -5,7 +5,7 @@ namespace Buildings
 {
     public static class BuildingDatabase
     {
-        private static readonly Dictionary<string, BuildingData> BuildingMap = new();
+        private static readonly Dictionary<string, BuildingBlueprint> BuildingMap = new();
 
         static BuildingDatabase()
         {
@@ -14,12 +14,12 @@ namespace Buildings
 
         private static void Initialize()
         {
-            var buildings = Resources.LoadAll<BuildingData>("Buildings");
+            var buildings = Resources.LoadAll<BuildingBlueprint>("Buildings");
             foreach (var data in buildings)
             {
                 if (data == null || data.prefab == null)
                 {
-                    Debug.LogError($"Invalid BuildingData or missing prefab for {data?.identifier}");
+                    Debug.LogError($"Invalid blueprint data or missing prefab for {data?.identifier}");
                     continue;
                 }
 
@@ -27,14 +27,14 @@ namespace Buildings
             }
         }
 
-        public static BuildingData GetBuildingByID(string id)
+        public static BuildingBlueprint GetBuildingByID(string id)
         {
             return BuildingMap.GetValueOrDefault(id);
         }
 
-        public static List<BuildingData> GetAllBuildings()
+        public static List<BuildingBlueprint> GetAllBuildings()
         {
-            return new List<BuildingData>(BuildingMap.Values);
+            return new List<BuildingBlueprint>(BuildingMap.Values);
         }
     }
 }

@@ -41,7 +41,7 @@ namespace UI
             _root.style.display = DisplayStyle.Flex;
 
             var building = clickedObject.GetComponent<Building>();
-            var viewModel = new ViewModelBuildingState(building.buildingState);
+            var viewModel = new ViewModelBuildingData(building.buildingData);
 
             _name.Bind(viewModel.Identifier, nameof(Label.text));
             _population.Bind(viewModel.CurrentPopulation, nameof(Label.text));

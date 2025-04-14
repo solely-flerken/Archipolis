@@ -31,7 +31,7 @@ namespace Save
         {
             var currentSaveData = new BaseSaveData
             {
-                buildings = BuildingManager.Buildings.Select(x => x.buildingState).ToList()
+                buildings = BuildingManager.Buildings.Select(x => x.buildingData).ToList()
             };
 
             var filePath = _saveSystem.Save(currentSaveData, fileName);
