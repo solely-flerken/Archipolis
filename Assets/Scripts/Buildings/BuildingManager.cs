@@ -179,7 +179,10 @@ namespace Buildings
             }
 
             var buildingComponent = obj.GetComponent<Building>();
-            Buildings.Add(buildingComponent);
+            if (!Buildings.Contains(buildingComponent))
+            {
+                Buildings.Add(buildingComponent);
+            }
 
             ResetSelection();
             // TODO: Only change to building again if the building placed wasn't a new one
