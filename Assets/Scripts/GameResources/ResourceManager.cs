@@ -22,16 +22,14 @@ namespace GameResources
                 Destroy(gameObject);
             }
 
-            // TODO: Subscribe to load/save events
-        }
-
-        private void Start()
-        {
+            // Initialize all defined resource types
             foreach (var resourceType in ResourceTypeDatabase.GetAllResources())
             {
                 // TODO: Get value from save file
-                Resources.Add(new ResourceAmount(resourceType, 0));
+                Resources[resourceType] = new ResourceAmount(resourceType, 0);
             }
+
+            // TODO: Subscribe to load/save events
         }
 
         private void Update()
