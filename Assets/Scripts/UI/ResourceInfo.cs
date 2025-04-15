@@ -15,7 +15,7 @@ namespace UI
             _container = _root.Q<VisualElement>("container");
 
             var resources = ResourceManager.Instance.Resources;
-            foreach (var resourceAmount in resources)
+            foreach (var resourceAmount in resources.Values)
             {
                 var resourceLabel = new Label();
                 var viewModel = new ViewModelResourceAmount(resourceAmount);

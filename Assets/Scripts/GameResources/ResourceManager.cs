@@ -8,7 +8,7 @@ namespace GameResources
     {
         public static ResourceManager Instance { get; private set; }
 
-        public HashSet<ResourceAmount> Resources { get; private set; } = new();
+        public Dictionary<ResourceType, ResourceAmount> Resources { get; private set; } = new();
 
         private void Awake()
         {
@@ -37,9 +37,9 @@ namespace GameResources
         private void Update()
         {
             // TODO: Remove this update, is only for testing
-            foreach (var resourceAmount in Resources.ToList())
+            foreach (var resourceAmount in Resources.Values)
             {
-                resourceAmount.Amount += 1 * Time.deltaTime;
+                Resources[resourceAmount.resourceType].amount += 1 * Time.deltaTime;
             }
         }
     }
