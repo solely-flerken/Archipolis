@@ -2,9 +2,9 @@
 {
     public enum ResourceCategory
     {
+        Currency,
         Food,
         Materials,
-        Currency,
         Tools
     }
 }
