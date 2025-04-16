@@ -1,4 +1,5 @@
-﻿using Hex;
+﻿using GameResources;
+using Hex;
 using UnityEngine;
 
 namespace Buildings
@@ -7,6 +8,13 @@ namespace Buildings
     public class Building : MonoBehaviour, IClickable
     {
         public BuildingData buildingData;
+
+        /// <summary>
+        /// ResourceFlow is also part of the `BuildingBlueprint` to define static consumption and production rates at the time of creation.
+        /// However, since inputs and outputs can change during runtime (due to upgrades, environmental factors, etc.), we store these values separately in here for dynamic modification
+        /// during gameplay. So the lists in `BuildingBlueprint` are only used during initialization.
+        /// </summary>
+        public ResourceFlow ResourceFlow { get; private set; }
 
         private MeshRenderer _meshRenderer;
         private MaterialPropertyBlock _propertyBlock;
@@ -30,6 +38,8 @@ namespace Buildings
                     footprint = blueprint.footprint
                 };
             }
+
+            ResourceFlow = blueprint.resourceFlow.Clone();
 
             _meshRenderer = GetComponent<MeshRenderer>();
             _propertyBlock = new MaterialPropertyBlock();

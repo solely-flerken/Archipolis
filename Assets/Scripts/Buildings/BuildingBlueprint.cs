@@ -1,4 +1,5 @@
 ﻿using System;
+using GameResources;
 using Hex;
 using UnityEngine;
 
@@ -11,5 +12,6 @@ namespace Buildings
         public string buildingName;
         public GameObject prefab;
         public HexCoordinate[] footprint = { new(0, 0) };
+        public ResourceFlow resourceFlow;
     }
 }

@@ -7,13 +7,18 @@ namespace GameResources
     [Serializable]
     public class ResourceAmount
     {
-        public ResourceType ResourceType { get; set; }
-        public float Amount { get; set; }
+        public ResourceType resourceType;
+        public float amount;
 
-        public ResourceAmount(ResourceType resourceType, int amount)
+        public ResourceAmount(ResourceType resourceType, float amount)
         {
-            ResourceType = resourceType;
-            Amount = amount;
+            this.resourceType = resourceType;
+            this.amount = amount;
+        }
+        
+        public ResourceAmount Clone()
+        {
+            return new ResourceAmount(resourceType, amount);
         }
     }
 
@@ -24,9 +29,9 @@ namespace GameResources
 
         public ViewModelResourceAmount(ResourceAmount resourceAmount)
         {
-            Amount = BindableProperty<float>.Bind(() => resourceAmount.Amount);
+            Amount = BindableProperty<float>.Bind(() => resourceAmount.amount);
             FormattedAmount = BindableProperty<string>.Bind(() =>
-                $"{resourceAmount.ResourceType.name}: {Amount.Value.ToString("0", CultureInfo.InvariantCulture)}");
+                $"{resourceAmount.resourceType.name}: {Amount.Value.ToString("0", CultureInfo.InvariantCulture)}");
         }
     }
 }
