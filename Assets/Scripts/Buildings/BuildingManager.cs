@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Events;
+using GameResources;
 using Hex;
 using Input;
 using Save;
@@ -156,6 +157,22 @@ namespace Buildings
 
         private void HandleBuildingPlaced(GameObject obj)
         {
+            var buildingComponent = obj.GetComponent<Building>();
+            if (!Buildings.Contains(buildingComponent))
+            {
+                // TODO: Refactor (I don't like this here that we access ResourceManager, maybe it's ok)
+                var blueprint = BuildingDatabase.GetBuildingByID(buildingComponent.buildingData.blueprintIdentifier);
+                if (!ResourceManager.Instance.HasEnoughResources(blueprint.buildingCosts))
+                {
+                    // TODO: Definitely need to notify the player about this somehow.
+                    // Can't place building because of insufficient buildings materials.
+                    return;
+                }
+                ResourceManager.Instance.Consume(blueprint.buildingCosts);
+                
+                Buildings.Add(buildingComponent);
+            }
+            
             // Free occupied cells
             HexGridManager.Instance.HexGrid.hexCells
                 .Where(x => x.OccupiedBy == obj)
@@ -169,12 +186,6 @@ namespace Buildings
             foreach (var cell in newTissue)
             {
                 cell.OccupiedBy = obj;
-            }
-
-            var buildingComponent = obj.GetComponent<Building>();
-            if (!Buildings.Contains(buildingComponent))
-            {
-                Buildings.Add(buildingComponent);
             }
 
             ResetSelection();
