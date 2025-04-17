@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Buildings;
+using Events;
+using Save;
 using UnityEngine;
 
 namespace GameResources
@@ -9,9 +11,9 @@ namespace GameResources
     {
         public static ResourceManager Instance { get; private set; }
 
-        public Dictionary<ResourceType, ResourceAmount> Resources { get; private set; } = new();
+        public static Dictionary<ResourceType, ResourceAmount> Resources { get; private set; } = new();
 
-        private Dictionary<(string buildingId, string flowId), float> _resourceFlowTimers = new();
+        private static readonly Dictionary<(string buildingId, string flowId), float> ResourceFlowTimers = new();
 
         private void Awake()
         {
@@ -25,14 +27,13 @@ namespace GameResources
                 Destroy(gameObject);
             }
 
-            // Initialize all defined resource types
+            // We need to initialize here to successfully bind the UI
             foreach (var resourceType in ResourceTypeDatabase.GetAllResources())
             {
-                // TODO: Get value from save file
-                Resources[resourceType] = new ResourceAmount(resourceType, 0);
+                Resources[resourceType] = new ResourceAmount(resourceType, 0f);
             }
 
-            // TODO: Subscribe to load/save events
+            EventSystem.Instance.OnLoadGame += HandleGameLoad;
         }
 
         private void Update()
@@ -42,7 +43,7 @@ namespace GameResources
                 var resourceFlow = building.ResourceFlow;
                 var key = (building.buildingData.identifier, resourceFlow.identifier);
 
-                var timer = _resourceFlowTimers.GetValueOrDefault(key, 0f);
+                var timer = ResourceFlowTimers.GetValueOrDefault(key, 0f);
 
                 timer += Time.deltaTime;
 
@@ -52,9 +53,26 @@ namespace GameResources
                     timer = 0f;
                 }
 
-                _resourceFlowTimers[key] = timer;
+                ResourceFlowTimers[key] = timer;
             }
         }
+
+        private void OnDestroy()
+        {
+            EventSystem.Instance.OnLoadGame -= HandleGameLoad;
+        }
+
+        #region Events
+
+        private static void HandleGameLoad(BaseSaveData saveData)
+        {
+            foreach (var resource in saveData.resources.Select(r => r.ToEntity()))
+            {
+                Resources[resource.resourceType].amount = resource.amount;
+            }
+        }
+
+        #endregion
 
         #region Utility
 

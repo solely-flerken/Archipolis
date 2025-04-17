@@ -14,7 +14,7 @@ namespace UI
             _root = GetComponent<UIDocument>().rootVisualElement;
             _container = _root.Q<VisualElement>("container");
 
-            var resources = ResourceManager.Instance.Resources;
+            var resources = ResourceManager.Resources;
             foreach (var resourceAmount in resources.Values)
             {
                 var resourceLabel = new Label();

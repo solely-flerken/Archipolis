@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Buildings;
 using Events;
+using GameResources;
 using UnityEngine;
 
 namespace Save
@@ -31,7 +32,8 @@ namespace Save
         {
             var currentSaveData = new BaseSaveData
             {
-                buildings = BuildingManager.Buildings.Select(x => x.buildingData).ToList()
+                buildings = BuildingManager.Buildings.Select(x => x.buildingData).ToList(),
+                resources = ResourceManager.Resources.Select(x => x.Value.ToDto()).ToList(), // TODO
             };
 
             var filePath = _saveSystem.Save(currentSaveData, fileName);

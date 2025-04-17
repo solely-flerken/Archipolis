@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Buildings;
+using GameResources;
 
 namespace Save
 {
@@ -8,5 +9,6 @@ namespace Save
     public class BaseSaveData
     {
         public List<BuildingData> buildings = new();
+        public List<ResourceAmountDto> resources = new();
     }
 }
