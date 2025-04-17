@@ -10,5 +10,6 @@ namespace Save
     {
         public List<BuildingData> buildings = new();
         public List<ResourceAmountDto> resources = new();
+        public List<ResourceFlowTimerEntry> resourceFlowTimers = new();
     }
 }

@@ -11,9 +11,9 @@ namespace GameResources
     {
         public static ResourceManager Instance { get; private set; }
 
-        public static Dictionary<ResourceType, ResourceAmount> Resources { get; private set; } = new();
+        public static readonly Dictionary<ResourceType, ResourceAmount> Resources = new();
 
-        private static readonly Dictionary<(string buildingId, string flowId), float> ResourceFlowTimers = new();
+        public static Dictionary<string, float> ResourceFlowTimers = new();
 
         private void Awake()
         {
@@ -41,7 +41,7 @@ namespace GameResources
             foreach (var building in BuildingManager.Buildings)
             {
                 var resourceFlow = building.ResourceFlow;
-                var key = (building.buildingData.identifier, resourceFlow.identifier);
+                var key = building.buildingData.identifier;
 
                 var timer = ResourceFlowTimers.GetValueOrDefault(key, 0f);
 
@@ -70,6 +70,8 @@ namespace GameResources
             {
                 Resources[resource.resourceType].amount = resource.amount;
             }
+
+            ResourceFlowTimers = saveData.resourceFlowTimers.DeserializeToDictionary();
         }
 
         #endregion

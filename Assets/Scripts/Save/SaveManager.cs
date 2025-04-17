@@ -34,6 +34,7 @@ namespace Save
             {
                 buildings = BuildingManager.Buildings.Select(x => x.buildingData).ToList(),
                 resources = ResourceManager.Resources.Select(x => x.Value.ToDto()).ToList(), // TODO
+                resourceFlowTimers = ResourceManager.ResourceFlowTimers.ToSerializableList()
             };
 
             var filePath = _saveSystem.Save(currentSaveData, fileName);
