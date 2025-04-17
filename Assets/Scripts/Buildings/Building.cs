@@ -23,8 +23,15 @@ namespace Buildings
 
         public void Initialize(BuildingBlueprint blueprint, BuildingData data = null)
         {
+            if (blueprint == null && buildingData == null)
+            {
+                return;
+            }
+            
             if (data != null)
             {
+                blueprint = BuildingDatabase.GetBuildingByID(data.blueprintIdentifier);
+
                 // Initialize from save data
                 buildingData = data;
                 transform.rotation = Quaternion.Euler(0, buildingData.yaw * 60, 0);
