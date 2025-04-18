@@ -18,7 +18,7 @@ namespace Hex
 
         public void OnClick(GameObject obj)
         {
-            Debug.Log($"HexCell ({HexCoordinate.Q}, {HexCoordinate.R}, {HexCoordinate.S})");
+            // Debug.Log($"HexCell ({HexCoordinate.Q}, {HexCoordinate.R}, {HexCoordinate.S})");
         }
     }
 }
