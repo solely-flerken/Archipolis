@@ -11,10 +11,10 @@ namespace Hex
         public bool Occupied => OccupiedBy;
         public bool Preview { get; set; }
 
-        private void OnDrawGizmos()
-        {
-            UnityEditor.Handles.Label(transform.position, $"({HexCoordinate.Q}, {HexCoordinate.R}, {HexCoordinate.S})");
-        }
+        // private void OnDrawGizmos()
+        // {
+        //     UnityEditor.Handles.Label(transform.position, $"({HexCoordinate.Q}, {HexCoordinate.R}, {HexCoordinate.S})");
+        // }
 
         public void OnClick(GameObject obj)
         {
