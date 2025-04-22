@@ -17,6 +17,7 @@ namespace Terrain
         [SerializeField] private float hexRadius = 1f;
         [SerializeField] private int gridRadius = 10;
         [SerializeField] private bool useCircularShape;
+        [SerializeField, Range(1f, 2f)] private float circleFactor = 1.5f;
 
         private void Awake()
         {
@@ -56,7 +57,14 @@ namespace Terrain
             var baseColors = new NativeArray<Color>(hexTemplate.colors.ToArray(), Allocator.TempJob);
 
             // Positions of individual hex cells
-            var positions = new NativeArray<float3>(hexPositions.ToArray(), Allocator.TempJob);
+            var positions = new NativeArray<float3>(hexPositions.Select(x => new float3(x.x, 0, x.y)).ToArray(),
+                Allocator.TempJob);
+            var hexColors = new NativeArray<Color>(hexCount, Allocator.TempJob);
+
+            for (var i = 0; i < hexCount; i++)
+            {
+                hexColors[i] = Color.Lerp(Color.green, Color.yellow, UnityEngine.Random.value);
+            }
 
             // Final mesh data
             var finalVertices = new NativeArray<float3>(hexCount * verticesPerHex, Allocator.TempJob);
@@ -66,6 +74,7 @@ namespace Terrain
             var meshJob = new HexMeshJob
             {
                 Positions = positions,
+                HexColors = hexColors,
                 BaseVertices = baseVertices,
                 BaseTriangles = baseTriangles,
                 BaseColors = baseColors,
@@ -83,6 +92,7 @@ namespace Terrain
         private struct HexMeshJob : IJobParallelFor
         {
             [ReadOnly] public NativeArray<float3> Positions;
+            [ReadOnly] public NativeArray<Color> HexColors;
 
             [ReadOnly] public NativeArray<float3> BaseVertices;
             [ReadOnly] public NativeArray<int> BaseTriangles;
@@ -102,7 +112,7 @@ namespace Terrain
                 for (var i = 0; i < BaseVertices.Length; i++)
                 {
                     Vertices[vertStart + i] = BaseVertices[i] + hexOffset;
-                    Colors[vertStart + i] = BaseColors[i];
+                    Colors[vertStart + i] = HexColors[index];
                 }
 
                 for (var i = 0; i < BaseTriangles.Length; i++)
@@ -132,9 +142,9 @@ namespace Terrain
             }
         }
 
-        private List<float3> GenerateHexPositions()
+        private List<float2> GenerateHexPositions()
         {
-            var hexPositions = new List<float3>();
+            var hexPositions = new List<float2>();
 
             for (var q = -gridRadius; q <= gridRadius; q++)
             {
@@ -147,7 +157,10 @@ namespace Terrain
 
                     if (useCircularShape)
                     {
-                        if (math.length(pos) <= gridRadius)
+                        var maxDistance = gridRadius * hexRadius * circleFactor;
+                        var maxDistanceSq = maxDistance * maxDistance;
+
+                        if (math.lengthsq(pos) <= maxDistanceSq)
                         {
                             hexPositions.Add(pos);
                         }
@@ -157,7 +170,7 @@ namespace Terrain
                         var s = -q - r;
                         var hexDistance = (math.abs(q) + math.abs(r) + math.abs(s)) / 2;
 
-                        if (hexDistance * hexRadius <= gridRadius * 1.1f)
+                        if (hexDistance <= gridRadius)
                         {
                             hexPositions.Add(pos);
                         }
@@ -168,11 +181,42 @@ namespace Terrain
             return hexPositions;
         }
 
-        private static float3 HexToWorldPosition(float radius, int q, int r)
+        private static float2 HexToWorldPosition(float radius, int q, int r)
         {
             var x = radius * 1.5f * q;
             var z = radius * math.sqrt(3f) * (r + q * 0.5f);
-            return new float3(x, 0f, z);
+            return new float2(x, z);
+        }
+
+        private static float3 WorldToHexPosition(float radius, float3 position)
+        {
+            var innerRadius = radius * 0.866025404f;
+
+            // Scale factors for conversion
+            var q = position.x / (1.5f * radius);
+            var r = position.z / (innerRadius * 2f) - q * 0.5f;
+            var s = -q - r;
+
+            // Round to get grid coordinates
+            var qi = (int)math.round(q);
+            var ri = (int)math.round(r);
+            var si = (int)math.round(s);
+
+            // Fix any rounding errors
+            var qDiff = math.abs(qi - q);
+            var rDiff = math.abs(ri - r);
+            var sDiff = math.abs(si - s);
+
+            if (qDiff > rDiff && qDiff > sDiff)
+            {
+                qi = -ri - si;
+            }
+            else if (rDiff > sDiff)
+            {
+                ri = -qi - si;
+            }
+
+            return new float3(qi, ri, si);
         }
 
         private static Mesh GenerateHexMesh(float radius, Color color)
