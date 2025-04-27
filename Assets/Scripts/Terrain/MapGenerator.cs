@@ -14,15 +14,10 @@ namespace Terrain
     {
         public static MapGenerator Instance;
 
-        public Dictionary<HexCoordinate, HexCellData> HexMap { get; private set; } = new();
-
         public const float HexRadius = 5f;
         public const bool IsFlatTopped = false;
-        [SerializeField] private int gridRadius = 10;
-        [SerializeField] private bool useCircularShape;
-        [SerializeField, Range(1f, 2f)] private float circleFactor = 1.5f;
 
-        public IslandGenerationParameters islandParameters;
+        public MapGenerationParameters mapParameters = MapGenerationParameters.Default();
 
         private void Awake()
         {
@@ -42,16 +37,14 @@ namespace Terrain
             if (!Application.isPlaying)
             {
                 // Defer mesh generation until the next editor frame to avoid conflicts with the Unity initialization.
-                EditorApplication.delayCall += () =>
-                {
-                    GenerateTerrainMesh();
-                };
+                EditorApplication.delayCall += () => { GenerateTerrainMesh(); };
             }
         }
 
         public Dictionary<HexCoordinate, HexCellData> GenerateTerrainMesh()
         {
-            var positions = Util.GenerateHexPositions(gridRadius, HexRadius, useCircularShape, circleFactor);
+            var positions = Util.GenerateHexPositions(mapParameters.gridRadius, HexRadius,
+                mapParameters.useCircularShape, mapParameters.circleFactor);
             var hexCount = positions.Count;
 
             var worldPositions =
@@ -63,7 +56,7 @@ namespace Terrain
             var mapRadius = Util.CalculateMapRadius(worldPositions, mapCenter);
 
             var generateTerrain =
-                new IslandBiomeGenerator(islandParameters, worldPositions, biomeMap, heightMap, mapCenter, mapRadius);
+                new MapBiomeGenerator(mapParameters, worldPositions, biomeMap, heightMap, mapCenter, mapRadius);
             generateTerrain.Schedule(hexCount, 64).Complete();
 
             // Template data
