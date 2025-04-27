@@ -13,6 +13,7 @@ namespace Terrain
         private readonly MapGenerationParameters _parameters;
         private readonly float2 _mapCenter;
         private readonly float _mapRadius;
+        private readonly float2 _seedOffset;
 
         public MapBiomeGenerator(MapGenerationParameters parameters, NativeArray<float3> positions,
             NativeArray<BiomeType> biomeMap, NativeArray<float> heightMap,
@@ -24,6 +25,11 @@ namespace Terrain
             _parameters = parameters;
             _mapCenter = mapCenter;
             _mapRadius = mapRadius;
+
+            _seedOffset = new float2(
+                math.sin(_parameters.seed * 12.9898f) * 43758.5453f % 1f,
+                math.sin(_parameters.seed * 78.233f) * 43758.5453f % 1f
+            ) * 10000f;
         }
 
         public void Execute(int index)
@@ -86,7 +92,7 @@ namespace Terrain
             for (var o = 0; o < _parameters.octaves; o++)
             {
                 // Get simplex noise and normalize to 0-1
-                var n = (noise.snoise(pos / currentFreq) + 1) * 0.5f;
+                var n = (noise.snoise((pos + _seedOffset) / currentFreq) + 1) * 0.5f;
 
                 // Track normalization
                 normalization += amplitude;
@@ -114,7 +120,7 @@ namespace Terrain
             for (var o = 0; o < _parameters.octaves; o++)
             {
                 // Get ridge noise
-                var n = 1 - math.abs(noise.snoise(pos / currentFreq));
+                var n = 1 - math.abs(noise.snoise((pos + _seedOffset) / currentFreq));
                 n *= n; // Square for sharper ridges
                 n *= weight;
 

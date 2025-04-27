@@ -10,6 +10,9 @@ namespace Terrain
         public bool useCircularShape;
         [Range(1f, 2f)] public float circleFactor;
 
+        [Header("Generation Seed")] [Tooltip("Seed for random generation")]
+        public uint seed;
+
         [Header("General Noise Settings")]
         [Tooltip("Number of noise layers to combine - higher values add more detail")]
         public int octaves;
@@ -66,6 +69,7 @@ namespace Terrain
         {
             return new MapGenerationParameters
             {
+                seed = 509,
                 gridRadius = 40,
                 useCircularShape = false,
                 circleFactor = 1.5f,
