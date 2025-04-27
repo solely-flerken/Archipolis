@@ -1,5 +1,4 @@
 ﻿using Terrain;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Hex
@@ -22,7 +21,7 @@ namespace Hex
                 Destroy(gameObject);
             }
 
-            HexGrid = this.AddComponent<HexGrid>();
+            HexGrid = new HexGrid();
         }
 
         private void Start()

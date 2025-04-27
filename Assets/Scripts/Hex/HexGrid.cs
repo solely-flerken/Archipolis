@@ -8,7 +8,7 @@ using Utils;
 
 namespace Hex
 {
-    public class HexGrid : MonoBehaviour
+    public class HexGrid
     {
         public Dictionary<HexCoordinate, HexCellData> HexMap { get; set; } = new();
 

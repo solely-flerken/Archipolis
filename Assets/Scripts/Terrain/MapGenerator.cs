@@ -39,14 +39,14 @@ namespace Terrain
 
         private void OnValidate()
         {
-            // if (!Application.isPlaying)
-            // {
-            //     // Defer mesh generation until the next editor frame to avoid conflicts with the Unity initialization.
-            //     EditorApplication.delayCall += () =>
-            //     {
-            //         GenerateTerrainMesh();
-            //     };
-            // }
+            if (!Application.isPlaying)
+            {
+                // Defer mesh generation until the next editor frame to avoid conflicts with the Unity initialization.
+                EditorApplication.delayCall += () =>
+                {
+                    GenerateTerrainMesh();
+                };
+            }
         }
 
         public Dictionary<HexCoordinate, HexCellData> GenerateTerrainMesh()
