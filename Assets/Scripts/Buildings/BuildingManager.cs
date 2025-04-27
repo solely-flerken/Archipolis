@@ -54,14 +54,6 @@ namespace Buildings
             EventSystem.Instance.OnModeChanged += HandleModeChange;
         }
 
-        private void HandleModeChange(Mode currentMode, Mode newMode)
-        {
-            if (currentMode == Mode.Placing)
-            {
-                CancelAllActions(currentMode);
-            }
-        }
-
         private void Update()
         {
             if (!_selectedObject || !_selectedBuilding ||
@@ -228,6 +220,14 @@ namespace Buildings
                 OccupyHexes(newTissue, buildingComponent);
 
                 Buildings.Add(buildingComponent);
+            }
+        }
+        
+        private void HandleModeChange(Mode currentMode, Mode newMode)
+        {
+            if (currentMode == Mode.Placing)
+            {
+                CancelAllActions(currentMode);
             }
         }
 
