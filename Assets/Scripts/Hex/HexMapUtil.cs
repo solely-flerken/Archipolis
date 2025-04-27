@@ -8,24 +8,23 @@ using Utils;
 
 namespace Hex
 {
-    public class HexGrid
+    public static class HexMapUtil
     {
-        public Dictionary<HexCoordinate, HexCellData> HexMap { get; set; } = new();
-
         private static readonly (int q, int r)[] NeighborOffsets =
         {
             (1, 0), (0, 1), (-1, 1),
             (-1, 0), (0, -1), (1, -1)
         };
 
-        public List<HexCoordinate> GetNeighbors(HexCoordinate coordinate)
+        public static List<HexCoordinate> GetNeighbors(this Dictionary<HexCoordinate, HexCellData> hexMap,
+            HexCoordinate coordinate)
         {
             var neighbors = new List<HexCoordinate>();
 
             foreach (var (dq, dr) in NeighborOffsets)
             {
                 var neighborCoordinate = new HexCoordinate(coordinate.Q + dq, coordinate.R + dr);
-                if (HexMap.ContainsKey(neighborCoordinate))
+                if (hexMap.ContainsKey(neighborCoordinate))
                 {
                     neighbors.Add(neighborCoordinate);
                 }
@@ -33,14 +32,15 @@ namespace Hex
 
             return neighbors;
         }
-        
+
         // TODO: Refactor: Convert worldPosition into Hex Pos and then look for that in HexMap
-        public HexCoordinate? GetNearestHexCoordinate(Vector3 worldPosition)
+        public static HexCoordinate? GetNearestHexCoordinate(this Dictionary<HexCoordinate, HexCellData> hexMap,
+            Vector3 worldPosition)
         {
             var closestDistance = float.PositiveInfinity;
             HexCoordinate? closestCoordinate = null;
 
-            foreach (var (coordinate, cellData) in HexMap)
+            foreach (var (coordinate, cellData) in hexMap)
             {
                 var distance = math.distance(worldPosition, cellData.WorldPosition);
 
@@ -53,12 +53,13 @@ namespace Hex
             return closestCoordinate;
         }
 
-        public HexCoordinate? GetNearestHexCoordinateToMousePosition()
+        public static HexCoordinate? GetNearestHexCoordinateToMousePosition(
+            this Dictionary<HexCoordinate, HexCellData> hexMap)
         {
             var mouseWorldPosition = MouseUtils.MouseToWorldPosition(Vector3.up, CameraController.Camera);
             mouseWorldPosition.y = 0f;
 
-            return GetNearestHexCoordinate(mouseWorldPosition);
+            return GetNearestHexCoordinate(hexMap, mouseWorldPosition);
         }
 
         public static List<HexCoordinate> GetTissue(HexCoordinate origin, HexCoordinate[] offsets)
@@ -66,7 +67,7 @@ namespace Hex
             var tissueCoordinates = new List<HexCoordinate>(offsets.Length);
             tissueCoordinates.AddRange(offsets
                 .Select(offset => new HexCoordinate(origin.Q + offset.Q, origin.R + offset.R)));
-                // .Where(coordinate => HexMap.ContainsKey(coordinate)));
+            // .Where(coordinate => HexMap.ContainsKey(coordinate)));
 
             return tissueCoordinates;
         }

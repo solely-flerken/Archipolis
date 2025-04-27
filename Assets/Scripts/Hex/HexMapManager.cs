@@ -1,13 +1,14 @@
-﻿using Terrain;
+﻿using System.Collections.Generic;
+using Terrain;
 using UnityEngine;
 
 namespace Hex
 {
-    public class HexGridManager : MonoBehaviour
+    public class HexMapManager : MonoBehaviour
     {
-        public static HexGridManager Instance { get; private set; }
+        public static HexMapManager Instance { get; private set; }
 
-        public HexGrid HexGrid { get; private set; }
+        public Dictionary<HexCoordinate, HexCellData> HexMap { get; private set; } = new();
 
         private void Awake()
         {
@@ -20,13 +21,11 @@ namespace Hex
             {
                 Destroy(gameObject);
             }
-
-            HexGrid = new HexGrid();
         }
 
         private void Start()
         {
-            HexGrid.HexMap = MapGenerator.Instance.GenerateTerrainMesh();
+            HexMap = MapGenerator.Instance.GenerateTerrainMesh();
         }
     }
 }

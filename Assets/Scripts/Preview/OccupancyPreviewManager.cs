@@ -67,7 +67,7 @@ namespace Preview
 
         private static Matrix4x4 GetMatrix(HexCoordinate coordinate)
         {
-            var position = HexGridManager.Instance.HexGrid.HexMap[coordinate].WorldPosition;
+            var position = HexMapManager.Instance.HexMap[coordinate].WorldPosition;
             var quaternion = Quaternion.identity;
             var scale = Vector3.one;
 

@@ -68,9 +68,9 @@ namespace Buildings
                 ModeStateManager.Instance.ModeState != Mode.Placing) return;
 
             // Snap to grid
-            var cell = HexGridManager.Instance.HexGrid.GetNearestHexCoordinateToMousePosition();
+            var cell = HexMapManager.Instance.HexMap.GetNearestHexCoordinateToMousePosition();
             if (!cell.HasValue) return;
-            _selectedObject.transform.position = HexGridManager.Instance.HexGrid.HexMap[cell.Value].WorldPosition;
+            _selectedObject.transform.position = HexMapManager.Instance.HexMap[cell.Value].WorldPosition;
 
             // Check placement validity
             var isValidPlacement = IsPlacementValid(_selectedBuilding);
@@ -81,7 +81,7 @@ namespace Buildings
             // Set preview of occupied cells
             PreviewTiles.Clear();
             PreviewManager.Instance.ClearPreview();
-            var tissue = HexGrid.GetTissue(cell.Value, _selectedBuilding.buildingData.footprint);
+            var tissue = HexMapUtil.GetTissue(cell.Value, _selectedBuilding.buildingData.footprint);
             foreach (var hexCoordinate in tissue)
             {
                 PreviewTiles[hexCoordinate] = _selectedBuilding;
@@ -118,7 +118,7 @@ namespace Buildings
                 case Mode.Building:
                 {
                     var coordinate =
-                        HexGridManager.Instance.HexGrid.GetNearestHexCoordinate(_selectedObject.transform.position);
+                        HexMapManager.Instance.HexMap.GetNearestHexCoordinate(_selectedObject.transform.position);
 
                     if (!coordinate.HasValue) return;
 
@@ -131,7 +131,7 @@ namespace Buildings
                 case Mode.Placing:
                 {
                     var coordinate =
-                        HexGridManager.Instance.HexGrid.GetNearestHexCoordinate(_selectedObject.transform.position);
+                        HexMapManager.Instance.HexMap.GetNearestHexCoordinate(_selectedObject.transform.position);
 
                     if (!coordinate.HasValue) return;
 
@@ -188,7 +188,7 @@ namespace Buildings
             PreviewManager.Instance.ClearPreview();
             FreeOccupiedHexes(buildingComponent);
 
-            var newTissue = HexGrid.GetTissue(_selectedBuilding.buildingData.origin,
+            var newTissue = HexMapUtil.GetTissue(_selectedBuilding.buildingData.origin,
                 _selectedBuilding.buildingData.footprint);
             OccupyHexes(newTissue, buildingComponent);
 
@@ -224,7 +224,7 @@ namespace Buildings
                 var createdBuilding = CreateBuilding(null, buildingData);
                 var buildingComponent = createdBuilding.GetComponent<Building>();
 
-                var newTissue = HexGrid.GetTissue(buildingData.origin, buildingData.footprint);
+                var newTissue = HexMapUtil.GetTissue(buildingData.origin, buildingData.footprint);
                 OccupyHexes(newTissue, buildingComponent);
 
                 Buildings.Add(buildingComponent);
@@ -264,7 +264,7 @@ namespace Buildings
                     PreviewManager.Instance.ClearPreview();
 
                     _selectedBuilding.buildingData.origin = _previousPosition;
-                    var coordinate = HexGridManager.Instance.HexGrid.HexMap[_selectedBuilding.buildingData.origin];
+                    var coordinate = HexMapManager.Instance.HexMap[_selectedBuilding.buildingData.origin];
                     _selectedObject.transform.position = coordinate.WorldPosition;
 
                     // We need this here since it won't be called in update(), because we set _selectedObject to null
@@ -284,13 +284,13 @@ namespace Buildings
 
         private bool IsPlacementValid(Building building)
         {
-            var coordinate = HexGridManager.Instance.HexGrid.GetNearestHexCoordinate(building.transform.position);
+            var coordinate = HexMapManager.Instance.HexMap.GetNearestHexCoordinate(building.transform.position);
             if (!coordinate.HasValue)
             {
                 return false;
             }
 
-            var adjacentHexCells = HexGrid.GetTissue(coordinate.Value, building.buildingData.footprint);
+            var adjacentHexCells = HexMapUtil.GetTissue(coordinate.Value, building.buildingData.footprint);
 
             var isInvalidPlacement = adjacentHexCells.Any(cell => IsHexInvalid(cell, building));
 
@@ -299,7 +299,7 @@ namespace Buildings
 
         private bool IsHexInvalid(HexCoordinate coordinate, Building building)
         {
-            var hexExists = !HexGridManager.Instance.HexGrid.HexMap.ContainsKey(coordinate);
+            var hexExists = !HexMapManager.Instance.HexMap.ContainsKey(coordinate);
             var hexIsOccupiedNotBySelf = OccupiedTiles.TryGetValue(coordinate, out var occupyingBuilding) &&
                                          occupyingBuilding != building;
             return hexExists || hexIsOccupiedNotBySelf;
@@ -312,7 +312,7 @@ namespace Buildings
 
             if (buildingData != null)
             {
-                position = HexGridManager.Instance.HexGrid.HexMap[buildingData.origin].WorldPosition;
+                position = HexMapManager.Instance.HexMap[buildingData.origin].WorldPosition;
                 buildingBlueprint = BuildingDatabase.GetBuildingByID(buildingData.blueprintIdentifier);
             }
             else

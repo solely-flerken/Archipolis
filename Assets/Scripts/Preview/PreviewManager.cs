@@ -61,7 +61,7 @@ namespace Preview
 
             foreach (var tile in previewTiles)
             {
-                var position = HexGridManager.Instance.HexGrid.HexMap[tile].WorldPosition;
+                var position = HexMapManager.Instance.HexMap[tile].WorldPosition;
                 AddHexagonToMesh(hexTemplate, position, ref vertices, ref triangles, indexOffset);
                 indexOffset += hexTemplate.vertexCount;
             }

@@ -60,7 +60,7 @@ namespace Buildings
 
         public void RotateFootprint()
         {
-            buildingData.footprint = HexGrid.RotateHexesClockwise(new HexCoordinate(0, 0), buildingData.footprint);
+            buildingData.footprint = HexMapUtil.RotateHexesClockwise(new HexCoordinate(0, 0), buildingData.footprint);
         }
 
         public void SetColor(Color color)
