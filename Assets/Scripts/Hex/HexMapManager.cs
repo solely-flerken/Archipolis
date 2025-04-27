@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Events;
+using Save;
 using Terrain;
 using UnityEngine;
 
@@ -25,6 +27,19 @@ namespace Hex
 
         private void Start()
         {
+            HexMap = MapGenerator.Instance.GenerateTerrainMesh();
+
+            EventSystem.Instance.OnLoadGame += HandleLoadGame;
+        }
+
+        private void OnDestroy()
+        {
+            EventSystem.Instance.OnLoadGame += HandleLoadGame;
+        }
+
+        private void HandleLoadGame(BaseSaveData saveData)
+        {
+            MapGenerator.Instance.mapParameters = saveData.mapGenerationParameters;
             HexMap = MapGenerator.Instance.GenerateTerrainMesh();
         }
     }

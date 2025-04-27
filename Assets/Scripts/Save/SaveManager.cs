@@ -2,6 +2,7 @@
 using Buildings;
 using Events;
 using GameResources;
+using Terrain;
 using UnityEngine;
 
 namespace Save
@@ -33,8 +34,9 @@ namespace Save
             var currentSaveData = new BaseSaveData
             {
                 buildings = BuildingManager.Buildings.Select(x => x.buildingData).ToList(),
-                resources = ResourceManager.Resources.Select(x => x.Value.ToDto()).ToList(), // TODO
-                resourceFlowTimers = ResourceManager.ResourceFlowTimers.ToSerializableList()
+                resources = ResourceManager.Resources.Select(x => x.Value.ToDto()).ToList(),
+                resourceFlowTimers = ResourceManager.ResourceFlowTimers.ToSerializableList(),
+                mapGenerationParameters = MapGenerator.Instance.mapParameters
             };
 
             var filePath = _saveSystem.Save(currentSaveData, fileName);
