@@ -5,6 +5,7 @@ using Events;
 using GameResources;
 using Hex;
 using Input;
+using Preview;
 using Save;
 using State;
 using UI;
@@ -18,7 +19,9 @@ namespace Buildings
     {
         public static BuildingManager Instance { get; private set; }
 
-        public static List<Building> Buildings { get; private set; } = new();
+        public static List<Building> Buildings { get; } = new();
+        private Dictionary<HexCoordinate, Building> OccupiedTiles { get; } = new();
+        private Dictionary<HexCoordinate, Building> PreviewTiles { get; } = new();
 
         private GameObject _selectedObject;
         private Building _selectedBuilding;
@@ -65,9 +68,9 @@ namespace Buildings
                 ModeStateManager.Instance.ModeState != Mode.Placing) return;
 
             // Snap to grid
-            var cell = HexGridManager.Instance.HexGrid.GetNearestHexCellToMousePosition();
-            if (cell is null) return;
-            _selectedObject.transform.position = cell.transform.position;
+            var cell = HexGridManager.Instance.HexGrid.GetNearestHexCoordinateToMousePosition();
+            if (!cell.HasValue) return;
+            _selectedObject.transform.position = HexGridManager.Instance.HexGrid.HexMap[cell.Value].WorldPosition;
 
             // Check placement validity
             var isValidPlacement = IsPlacementValid(_selectedBuilding);
@@ -75,13 +78,16 @@ namespace Buildings
             // Overlay color based on placement validity
             ColorBasedOnValidity(isValidPlacement, _selectedBuilding);
 
-            // TODO: Refactor this (expensive)
             // Set preview of occupied cells
-            HexGridManager.Instance.HexGrid.hexCells.ForEach(x => x.Preview = false);
-            var adjacentHexCells =
-                HexGridManager.Instance.HexGrid.GetTissue(cell.HexCoordinate,
-                    _selectedBuilding.buildingData.footprint);
-            adjacentHexCells.Where(x => x is not null).ToList().ForEach(x => x.Preview = true);
+            PreviewTiles.Clear();
+            PreviewManager.Instance.ClearPreview();
+            var tissue = HexGrid.GetTissue(cell.Value, _selectedBuilding.buildingData.footprint);
+            foreach (var hexCoordinate in tissue)
+            {
+                PreviewTiles[hexCoordinate] = _selectedBuilding;
+            }
+
+            PreviewManager.Instance.SetPreview(tissue);
         }
 
         private void OnDestroy()
@@ -108,25 +114,28 @@ namespace Buildings
                 case Mode.Bulldozing:
                     ConfirmationDialog.Show("Are you sure to delete this building?", () => { DeleteBuilding(obj); });
                     break;
-                // Pick building up or place building
+                // Pick building up
                 case Mode.Building:
                 {
-                    var objectHexCell =
-                        HexGridManager.Instance.HexGrid.GetNearestHexCell(_selectedObject.transform.position);
+                    var coordinate =
+                        HexGridManager.Instance.HexGrid.GetNearestHexCoordinate(_selectedObject.transform.position);
 
-                    if (objectHexCell == null) return;
+                    if (!coordinate.HasValue) return;
 
-                    _previousPosition = objectHexCell.HexCoordinate;
+                    _previousPosition = coordinate.Value;
 
                     ModeStateManager.Instance.SetMode(Mode.Placing);
                     break;
                 }
+                // Place building
                 case Mode.Placing:
                 {
-                    var nearestHexCell =
-                        HexGridManager.Instance.HexGrid.GetNearestHexCell(_selectedObject.transform.position);
+                    var coordinate =
+                        HexGridManager.Instance.HexGrid.GetNearestHexCoordinate(_selectedObject.transform.position);
 
-                    _selectedBuilding.buildingData.origin = nearestHexCell.HexCoordinate;
+                    if (!coordinate.HasValue) return;
+
+                    _selectedBuilding.buildingData.origin = coordinate.Value;
 
                     if (!IsPlacementValid(_selectedBuilding)) return;
 
@@ -168,25 +177,20 @@ namespace Buildings
                     // Can't place building because of insufficient buildings materials.
                     return;
                 }
+
                 ResourceManager.Instance.Consume(blueprint.buildingCosts);
-                
+
                 Buildings.Add(buildingComponent);
             }
-            
-            // Free occupied cells
-            HexGridManager.Instance.HexGrid.hexCells
-                .Where(x => x.OccupiedBy == obj)
-                .ToList()
-                .ForEach(x => x.OccupiedBy = null);
 
-            // Occupy new cells
-            var newTissue =
-                HexGridManager.Instance.HexGrid.GetTissue(_selectedBuilding.buildingData.origin,
-                    _selectedBuilding.buildingData.footprint);
-            foreach (var cell in newTissue)
-            {
-                cell.OccupiedBy = obj;
-            }
+
+            PreviewTiles.Clear();
+            PreviewManager.Instance.ClearPreview();
+            FreeOccupiedHexes(buildingComponent);
+
+            var newTissue = HexGrid.GetTissue(_selectedBuilding.buildingData.origin,
+                _selectedBuilding.buildingData.footprint);
+            OccupyHexes(newTissue, buildingComponent);
 
             ResetSelection();
             // TODO: Only change to building again if the building placed wasn't a new one
@@ -211,20 +215,19 @@ namespace Buildings
         {
             Buildings.ToList().ForEach(building => DeleteBuilding(building.gameObject));
             Buildings.Clear();
+            OccupiedTiles.Clear();
+            OccupancyPreviewManager.Instance.ClearPreviewHexes();
 
             // TODO: Refactor this
             foreach (var buildingData in saveData.buildings)
             {
                 var createdBuilding = CreateBuilding(null, buildingData);
+                var buildingComponent = createdBuilding.GetComponent<Building>();
 
-                var newTissue =
-                    HexGridManager.Instance.HexGrid.GetTissue(buildingData.origin, buildingData.footprint);
-                foreach (var cell in newTissue)
-                {
-                    cell.OccupiedBy = createdBuilding;
-                }
+                var newTissue = HexGrid.GetTissue(buildingData.origin, buildingData.footprint);
+                OccupyHexes(newTissue, buildingComponent);
 
-                Buildings.Add(createdBuilding.GetComponent<Building>());
+                Buildings.Add(buildingComponent);
             }
         }
 
@@ -251,17 +254,18 @@ namespace Buildings
                     if (_selectedBuilding == null) return;
 
                     // Checks if the building is newly created and wasn't placed yet. If this is the case we delete the building on cancel.
-                    if (!HexGridManager.Instance.HexGrid.hexCells.Exists(cell => cell.OccupiedBy == _selectedObject))
+                    if (!OccupiedTiles.ContainsKey(_selectedBuilding.buildingData.origin))
                     {
                         DeleteBuilding(_selectedObject);
                         return;
                     }
 
-                    HexGridManager.Instance.HexGrid.hexCells.ForEach(x => x.Preview = false);
-                    
+                    PreviewTiles.Clear();
+                    PreviewManager.Instance.ClearPreview();
+
                     _selectedBuilding.buildingData.origin = _previousPosition;
-                    var cell = HexGridManager.Instance.HexGrid.GetCell(_selectedBuilding.buildingData.origin);
-                    _selectedObject.transform.position = cell.transform.position;
+                    var coordinate = HexGridManager.Instance.HexGrid.HexMap[_selectedBuilding.buildingData.origin];
+                    _selectedObject.transform.position = coordinate.WorldPosition;
 
                     // We need this here since it won't be called in update(), because we set _selectedObject to null
                     var isValidPlacement = IsPlacementValid(_selectedBuilding);
@@ -278,18 +282,27 @@ namespace Buildings
             ResetSelection();
         }
 
-        private static bool IsPlacementValid(Building building)
+        private bool IsPlacementValid(Building building)
         {
-            var cell = HexGridManager.Instance.HexGrid.GetNearestHexCell(building.transform.position);
-            if (cell is null) return false;
+            var coordinate = HexGridManager.Instance.HexGrid.GetNearestHexCoordinate(building.transform.position);
+            if (!coordinate.HasValue)
+            {
+                return false;
+            }
 
-            var adjacentHexCells =
-                HexGridManager.Instance.HexGrid.GetTissue(cell.HexCoordinate, building.buildingData.footprint);
+            var adjacentHexCells = HexGrid.GetTissue(coordinate.Value, building.buildingData.footprint);
 
-            var isInvalidPlacement = adjacentHexCells.Any(adjacentCell =>
-                !adjacentCell || (adjacentCell.Occupied && adjacentCell.OccupiedBy != building.gameObject));
+            var isInvalidPlacement = adjacentHexCells.Any(cell => IsHexInvalid(cell, building));
 
             return !isInvalidPlacement;
+        }
+
+        private bool IsHexInvalid(HexCoordinate coordinate, Building building)
+        {
+            var hexExists = !HexGridManager.Instance.HexGrid.HexMap.ContainsKey(coordinate);
+            var hexIsOccupiedNotBySelf = OccupiedTiles.TryGetValue(coordinate, out var occupyingBuilding) &&
+                                         occupyingBuilding != building;
+            return hexExists || hexIsOccupiedNotBySelf;
         }
 
         private static GameObject CreateBuilding(BuildingBlueprint blueprint, BuildingData buildingData = null)
@@ -299,7 +312,7 @@ namespace Buildings
 
             if (buildingData != null)
             {
-                position = HexGridManager.Instance.HexGrid.HexToWorld(buildingData.origin);
+                position = HexGridManager.Instance.HexGrid.HexMap[buildingData.origin].WorldPosition;
                 buildingBlueprint = BuildingDatabase.GetBuildingByID(buildingData.blueprintIdentifier);
             }
             else
@@ -322,18 +335,35 @@ namespace Buildings
                 Buildings.Remove(buildingComponent);
             }
 
-            foreach (var cell in HexGridManager.Instance.HexGrid.hexCells.Where(cell => cell.Preview))
-            {
-                cell.Preview = false;
-            }
-
-            foreach (var cell in HexGridManager.Instance.HexGrid.hexCells.Where(cell =>
-                         cell.OccupiedBy == building))
-            {
-                cell.OccupiedBy = null;
-            }
+            PreviewTiles.Clear();
+            PreviewManager.Instance.ClearPreview();
+            FreeOccupiedHexes(buildingComponent);
 
             Destroy(building);
+        }
+
+        private void FreeOccupiedHexes(Building building)
+        {
+            var hexesToClear = OccupiedTiles
+                .Where(pair => pair.Value == building)
+                .Select(pair => pair.Key)
+                .ToList();
+
+            foreach (var coordinate in hexesToClear)
+            {
+                OccupiedTiles.Remove(coordinate);
+                OccupancyPreviewManager.Instance.RemovePreviewHex(coordinate);
+            }
+        }
+
+        private void OccupyHexes(List<HexCoordinate> coordinates, Building building)
+        {
+            foreach (var cell in coordinates)
+            {
+                OccupiedTiles[cell] = building;
+            }
+
+            OccupancyPreviewManager.Instance.AddPreviewHexes(coordinates);
         }
 
         #endregion

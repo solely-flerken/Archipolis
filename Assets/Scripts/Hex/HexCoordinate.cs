@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace Hex 
 {
-    [System.Serializable]
-    public struct HexCoordinate 
+    [Serializable]
+    public struct HexCoordinate : IEquatable<HexCoordinate>
     {
         [SerializeField] private int q;
         [SerializeField] private int r;
@@ -16,6 +17,21 @@ namespace Hex
         {
             this.q = q;
             this.r = r;
+        }
+
+        public bool Equals(HexCoordinate other)
+        {
+            return q == other.q && r == other.r;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is HexCoordinate other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(q, r);
         }
     }
 }

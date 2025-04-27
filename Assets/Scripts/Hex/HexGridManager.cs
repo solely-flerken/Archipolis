@@ -1,4 +1,5 @@
-﻿using Unity.VisualScripting;
+﻿using Terrain;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Hex
@@ -7,10 +8,7 @@ namespace Hex
     {
         public static HexGridManager Instance { get; private set; }
 
-        public int radius = 3;
-        public int spacing = 1;
-        
-        public HexGrid HexGrid {get; private set;}
+        public HexGrid HexGrid { get; private set; }
 
         private void Awake()
         {
@@ -23,26 +21,13 @@ namespace Hex
             {
                 Destroy(gameObject);
             }
-            
+
             HexGrid = this.AddComponent<HexGrid>();
-            HexGrid.spacing = spacing;
-            
-            GenerateRoundHexGrid();
         }
 
-        private void GenerateRoundHexGrid()
+        private void Start()
         {
-            for (var q = -radius; q <= radius; q++)
-            {
-                for (var r = -radius; r <= radius; r++)
-                {
-                    var s = -q - r;
-                    if (Mathf.Abs(s) <= radius)
-                    {
-                        HexGrid.CreateCell(q, r);
-                    }
-                }
-            }
+            HexGrid.HexMap = MapGenerator.Instance.GenerateTerrainMesh();
         }
     }
 }
