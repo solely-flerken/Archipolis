@@ -22,7 +22,7 @@ MonoBehaviour:
     r: 0
   buildingCosts:
   - resourceType: {fileID: 11400000, guid: cc1d8e8ad22f41040a60060003aa390a, type: 2}
-    amount: 50
+    amount: 0
   resourceFlow:
     inputsConsuming: []
     outputsGenerating:
