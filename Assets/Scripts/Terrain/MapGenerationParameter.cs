@@ -36,24 +36,6 @@ namespace Terrain
         [Tooltip("How quickly terrain drops from center to edge - shapes island outline")]
         public float falloffSteepness;
 
-        [Header("Small Islands Settings")] [Tooltip("Toggle to enable/disable generation of additional small islands")]
-        public bool enableSmallIslands;
-
-        [Tooltip("Scale of noise for small islands - affects island size and distribution")]
-        public float islandNoiseScale;
-
-        [Range(0, 1)] [Tooltip("Minimum noise value for small islands - higher means fewer islands")]
-        public float islandThreshold;
-
-        [Range(0, 1)] [Tooltip("How prominent small islands are relative to main island")]
-        public float islandStrength;
-
-        [Header("Island Shape")] [Tooltip("Toggle to create a flat area in the center of the island")]
-        public bool enableCentralPlateau;
-
-        [Range(0, 1)] [Tooltip("Radius of central plateau as fraction of total island size")]
-        public float plateauSize;
-
         [Tooltip("Power function for elevation - higher values create more distinct levels")]
         public float heightCurve;
 
@@ -80,12 +62,6 @@ namespace Terrain
                 ridgeNoiseScale = 1,
                 ridgeInfluence = 0,
                 falloffSteepness = 1.5f,
-                enableSmallIslands = false,
-                islandNoiseScale = 0,
-                islandThreshold = 0,
-                islandStrength = 0,
-                enableCentralPlateau = false,
-                plateauSize = 0,
                 heightCurve = 0.7f,
                 deepOceanThreshold = 0.2f,
                 oceanThreshold = 0.3f,

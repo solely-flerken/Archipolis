@@ -60,24 +60,8 @@ namespace Terrain
             // Blend noise types
             var blendedNoise = math.lerp(mainNoise, ridgeNoise, _parameters.ridgeInfluence);
 
-            // Generate small islands noise with different scale
-            var islandNoise = 0f;
-            if (_parameters.enableSmallIslands)
-            {
-                // Use different scale for smaller islands
-                islandNoise = OctavedSimplexNoise(pos, _parameters.islandNoiseScale);
-
-                // Apply threshold to create distinct small islands
-                islandNoise = islandNoise > _parameters.islandThreshold
-                    ? (islandNoise - _parameters.islandThreshold) / (1 - _parameters.islandThreshold)
-                    : 0;
-            }
-
-            // Combine main island and small islands
-            var combinedNoise = math.max(blendedNoise * falloff, islandNoise * _parameters.islandStrength);
-
             // Create more distinct elevation levels
-            combinedNoise = math.pow(combinedNoise, _parameters.heightCurve);
+            var combinedNoise = math.pow(blendedNoise * falloff, _parameters.heightCurve);
 
             return combinedNoise;
         }
@@ -153,16 +137,8 @@ namespace Terrain
                 return 0;
             }
 
-            // Apply falloff curve with plateau in center
-            var falloffValue = 1 - math.pow(distanceNormalized, _parameters.falloffSteepness);
-
-            // Optional flatter center
-            if (_parameters.enableCentralPlateau && distanceNormalized < _parameters.plateauSize)
-            {
-                return 1.0f;
-            }
-
-            return falloffValue;
+            // Apply falloff curve
+            return 1 - math.pow(distanceNormalized, _parameters.falloffSteepness);
         }
 
         private BiomeType DetermineBiomeFromHeight(float height)
