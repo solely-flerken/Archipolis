@@ -17,8 +17,9 @@ namespace Terrain
 
         [SerializeField] private Material chunkMaterial;
 
-        [Header("Chunk Settings")] 
-        [SerializeField] private int initialPoolSize = 10;
+        [Header("Chunk Settings")] [SerializeField]
+        private int initialPoolSize = 10;
+
         [SerializeField] private int expandAmount = 1;
 
         public const float HexRadius = 5f;
@@ -38,7 +39,7 @@ namespace Terrain
                 return;
             }
 
-            _chunkPool = new ChunkPool(chunkMaterial, transform, initialPoolSize, expandAmount);
+            _chunkPool ??= new ChunkPool(chunkMaterial, transform, initialPoolSize, expandAmount);
         }
 
         private void OnValidate()
@@ -48,6 +49,11 @@ namespace Terrain
                 // Defer mesh generation until the next editor frame to avoid conflicts with the Unity initialization.
                 EditorApplication.delayCall += () =>
                 {
+                    if (this == null)
+                    {
+                        return;
+                    }
+
                     _chunkPool ??= new ChunkPool(chunkMaterial, transform, initialPoolSize, expandAmount);
                     GenerateTerrainMesh();
                 };

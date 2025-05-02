@@ -640,7 +640,7 @@ MonoBehaviour:
     useCircularShape: 0
     circleFactor: 1.5
     chunkSize: 40
-    seed: 104
+    seed: 499
     octaves: 6
     frequency: 15
     lacunarity: 40

@@ -29,7 +29,19 @@ namespace Terrain
 
         public GameObject GetChunk(Mesh mesh)
         {
-            var chunk = GetOrCreateChunk();
+            GameObject chunk = null;
+
+            while (_inactiveChunks.Count > 0 && chunk == null)
+            {
+                chunk = _inactiveChunks.Dequeue();
+            }
+
+            // Expand the chunk pool if none were found
+            if (chunk == null)
+            {
+                ExpandChunkPool();
+                chunk = _inactiveChunks.Dequeue();
+            }
 
             chunk.SetActive(true);
             chunk.GetComponent<MeshFilter>().mesh = mesh;
@@ -43,6 +55,8 @@ namespace Terrain
         {
             if (chunk == null)
             {
+                // Remove null entries
+                _activeChunks.Remove(chunk);
                 return;
             }
 
@@ -90,16 +104,6 @@ namespace Terrain
             ClearInactiveChunks();
         }
 
-        private GameObject GetOrCreateChunk()
-        {
-            if (_inactiveChunks.Count == 0)
-            {
-                ExpandChunkPool();
-            }
-
-            return _inactiveChunks.Dequeue();
-        }
-
         private void ExpandChunkPool()
         {
             for (var i = 0; i < math.max(1, _expandAmount); i++)
@@ -131,7 +135,7 @@ namespace Terrain
             {
                 Object.DestroyImmediate(obj);
                 return;
-            } 
+            }
 #endif
             Object.Destroy(obj);
         }
