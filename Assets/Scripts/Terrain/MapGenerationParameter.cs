@@ -10,6 +10,8 @@ namespace Terrain
         public bool useCircularShape;
         [Range(1f, 2f)] public float circleFactor;
 
+        [Header("Chunk Settings")] public int chunkSize;
+
         [Header("Generation Seed")] [Tooltip("Seed for random generation")]
         public uint seed;
 
@@ -51,10 +53,11 @@ namespace Terrain
         {
             return new MapGenerationParameters
             {
-                seed = 509,
                 gridRadius = 40,
                 useCircularShape = false,
                 circleFactor = 1.5f,
+                chunkSize = 32,
+                seed = 509,
                 octaves = 6,
                 frequency = 15,
                 lacunarity = 40,

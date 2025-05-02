@@ -11,16 +11,16 @@ namespace Terrain
     {
         [ReadOnly] public NativeArray<float3> Positions;
         [ReadOnly] public NativeArray<BiomeType> BiomeMap;
-        [ReadOnly] public NativeArray<float> HeightMap;
 
         [ReadOnly] public NativeArray<float3> BaseVertices;
         [ReadOnly] public NativeArray<int> BaseTriangles;
-        [ReadOnly] public NativeArray<Color> BaseColors;
 
         [NativeDisableParallelForRestriction] public NativeArray<float3> Vertices;
         [NativeDisableParallelForRestriction] public NativeArray<int> Triangles;
         [NativeDisableParallelForRestriction] public NativeArray<Color> Colors;
 
+        [ReadOnly] public NativeArray<int> HexIndices;
+        
         // Color mapping for visualization
         private static readonly Color DeepOceanColor = new(0.1f, 0.1f, 0.4f);
         private static readonly Color ShallowOceanColor = new(0.2f, 0.2f, 0.6f);
@@ -33,8 +33,10 @@ namespace Terrain
 
         public void Execute(int index)
         {
-            var position = Positions[index];
-            var color = GetBiomeColor(BiomeMap[index]);
+            var globalIndex = HexIndices[index];
+            
+            var position = Positions[globalIndex];
+            var color = GetBiomeColor(BiomeMap[globalIndex]);
 
             var vertStart = index * BaseVertices.Length;
             var triStart = index * BaseTriangles.Length;
