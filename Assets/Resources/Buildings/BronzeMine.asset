@@ -10,22 +10,16 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f8b7b70f1b55475f9abcb1c3222e92dc, type: 3}
-  m_Name: SampleBuilding
+  m_Name: BronzeMine
   m_EditorClassIdentifier: 
-  identifier: 9cfb7721-e393-4a22-b192-69e2c497a30c
-  buildingName: Sample
+  identifier: 0708acba-dc6a-4197-b430-31e6f5b017c2
+  buildingName: Bronze Mine
   prefab: {fileID: 2132833067288156961, guid: 396805b42abddec4c90508ac570a486e, type: 3}
   footprint:
   - q: 0
     r: 0
-  - q: 1
-    r: 0
-  buildingCosts:
-  - resourceType: {fileID: 11400000, guid: cc1d8e8ad22f41040a60060003aa390a, type: 2}
-    amount: 0
+  buildingCosts: []
   resourceFlow:
     inputsConsuming: []
-    outputsGenerating:
-    - resourceType: {fileID: 11400000, guid: cc1d8e8ad22f41040a60060003aa390a, type: 2}
-      amount: 50
-    intervalSeconds: 5
+    outputsGenerating: []
+    intervalSeconds: 60
