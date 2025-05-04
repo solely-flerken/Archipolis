@@ -1,14 +1,58 @@
 .button {
     width: 150px;
-    height: 75%;
     background-color: rgb(0, 168, 255);
-    border-top-width: 4px;
-    border-right-width: 4px;
-    border-bottom-width: 4px;
-    border-left-width: 4px;
-    border-left-color: rgb(0, 100, 255);
-    border-right-color: rgb(0, 100, 255);
-    border-top-color: rgb(0, 100, 255);
-    border-bottom-color: rgb(0, 100, 255);
+    border-width: 4px;
+    border-color: rgb(0, 100, 255);
     border-radius: 24px;
+}
+
+.customScrollView .unity-scroll-view__content-and-vertical-scroll-container {
+    align-items: center;
+}
+
+.customScrollView .unity-scroller {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.customScrollView .unity-scroller__low-button {
+    display: none;
+}
+
+.customScrollView .unity-scroller__high-button {
+    display: none;
+}
+
+.customScrollView .unity-base-slider, .unity-base-slider > * {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /*margin: 0;*/ /* Uncomment to make the slider take the whole space of the container including the space for the high- and low-buttons */
+}
+
+.customScrollView .unity-base-slider__drag-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 4px;
+}
+
+.customScrollView .unity-base-slider__tracker {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 4px;
+    background-color: rgba(71, 75, 78, 0.39);
+    border-width: 0;
+    border-radius: 4px;
+}
+
+.customScrollView .unity-base-slider__dragger {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 4px;
+    background-color: #964b00;
+    border-radius: 4px;
 }
