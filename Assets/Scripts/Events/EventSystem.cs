@@ -47,11 +47,11 @@ namespace Events
         public event Action<BaseSaveData> OnSaveGame;
         public event Action<BaseSaveData> OnLoadGame;
 
-        // Custom
+        // Building
         public event Action<GameObject> OnClickableClick;
         public event Action<GameObject> OnBuildingClick;
         public event Action<GameObject> OnBuildingPlaced;
-
+        
         public void InvokeClick()
         {
             OnClick?.Invoke();
