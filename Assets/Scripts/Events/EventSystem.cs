@@ -38,6 +38,7 @@ namespace Events
         public event Action OnCancel;
 
         // UI
+        public event Action<string> OnButtonClick;
         public event Action<string> OnPlaceBuildingUI;
 
         // State
@@ -51,7 +52,7 @@ namespace Events
         public event Action<GameObject> OnClickableClick;
         public event Action<GameObject> OnBuildingClick;
         public event Action<GameObject> OnBuildingPlaced;
-        
+
         public void InvokeClick()
         {
             OnClick?.Invoke();
@@ -125,6 +126,11 @@ namespace Events
         public void InvokeMouseWheelHold(bool isHeld)
         {
             OnMouseWheelHold?.Invoke(isHeld);
+        }
+
+        public void InvokeButtonClick(string identifier)
+        {
+            OnButtonClick?.Invoke(identifier);
         }
 
         public void InvokeOnPlaceBuildingUI(string identifier)
