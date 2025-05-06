@@ -32,7 +32,10 @@ namespace GameResources
             {
                 Resources[resourceType] = new ResourceAmount(resourceType, 0f);
             }
+        }
 
+        private void Start()
+        {
             EventSystem.Instance.OnLoadGame += HandleGameLoad;
         }
 
