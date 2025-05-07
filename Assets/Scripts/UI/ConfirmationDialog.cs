@@ -7,11 +7,10 @@ using UnityEngine.UIElements;
 
 namespace UI
 {
-    public class ConfirmationDialog : MonoBehaviour
+    public class ConfirmationDialog : UserInterfaceBase
     {
-        private static ConfirmationDialog _instance;
+        public static ConfirmationDialog Instance;
 
-        private static VisualElement _root;
         private static Label _label;
         private static Button _confirm;
         private static Button _deny;
@@ -21,9 +20,9 @@ namespace UI
         
         private void Awake()
         {
-            if (_instance == null)
+            if (Instance == null)
             {
-                _instance = this;
+                Instance = this;
             }
             else
             {
@@ -31,20 +30,22 @@ namespace UI
             }
         }
 
-        private void OnEnable()
+        private void Start()
         {
-            _root = GetComponent<UIDocument>().rootVisualElement;
-            _label = _root.Q<Label>("label");
-            _confirm = _root.Q<Button>("confirm");
-            _deny = _root.Q<Button>("deny");
+            IsVisibleInitially = false;
+            
+            Root = GetComponent<UIDocument>().rootVisualElement;
+            _label = Root.Q<Label>("label");
+            _confirm = Root.Q<Button>("confirm");
+            _deny = Root.Q<Button>("deny");
 
-            _root.style.display = DisplayStyle.None;
+            Root.style.display = DisplayStyle.None;
 
             _confirm.clicked += Confirm;
             _deny.clicked += Deny;
         }
 
-        private void OnDisable()
+        private void OnDestroy()
         {
             _confirm.clicked -= Confirm;
             _deny.clicked -= Deny;
@@ -62,20 +63,20 @@ namespace UI
         {
             if (!_canReceiveInput) return;
             
-            _root.SendToBack();
-            _root.style.display = DisplayStyle.None;
+            Root.SendToBack();
+            Root.style.display = DisplayStyle.None;
         }
 
-        public static void Show(string message, Action confirmAction)
+        public void Show(string message, Action confirmAction)
         {
-            _instance._onConfirm = confirmAction;
+            Instance._onConfirm = confirmAction;
             _label.text = message;
             
-            _root.BringToFront();
-            _root.style.display = DisplayStyle.Flex;
+            Root.BringToFront();
+            Root.style.display = DisplayStyle.Flex;
             
-            _instance._canReceiveInput = false;
-            _instance.StartCoroutine(_instance.EnableInputAfterDelay());
+            Instance._canReceiveInput = false;
+            Instance.StartCoroutine(Instance.EnableInputAfterDelay());
         }
         
         private IEnumerator EnableInputAfterDelay()

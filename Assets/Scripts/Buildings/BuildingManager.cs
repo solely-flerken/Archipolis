@@ -104,7 +104,7 @@ namespace Buildings
             {
                 // Delete building
                 case Mode.Bulldozing:
-                    ConfirmationDialog.Show("Are you sure to delete this building?", () => { DeleteBuilding(obj); });
+                    ConfirmationDialog.Instance.Show("Are you sure to delete this building?", () => { DeleteBuilding(obj); });
                     break;
                 // Pick building up
                 case Mode.Building:

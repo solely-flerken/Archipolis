@@ -6,21 +6,22 @@ using UnityEngine.UIElements;
 
 namespace UI
 {
-    public class BuildInfo : MonoBehaviour
+    public class BuildInfo : UserInterfaceBase
     {
-        private VisualElement _root;
         private Label _name;
         private Label _population;
         private Toggle _isActive;
 
         private void Start()
         {
-            _root = GetComponent<UIDocument>().rootVisualElement;
-            _name = _root.Q<Label>("name");
-            _population = _root.Q<Label>("population");
-            _isActive = _root.Q<Toggle>("isActive");
+            IsVisibleInitially = false;
+            
+            Root = GetComponent<UIDocument>().rootVisualElement;
+            _name = Root.Q<Label>("name");
+            _population = Root.Q<Label>("population");
+            _isActive = Root.Q<Toggle>("isActive");
 
-            _root.style.display = DisplayStyle.None;
+            Root.style.display = DisplayStyle.None;
 
             EventSystem.Instance.OnBuildingClick += ShowBuildingInfo;
             EventSystem.Instance.OnModeChanged += HideUIOnModeChange;
@@ -38,7 +39,7 @@ namespace UI
         {
             if (ModeStateManager.Instance.ModeState != Mode.Idle) return;
 
-            _root.style.display = DisplayStyle.Flex;
+            Root.style.display = DisplayStyle.Flex;
 
             var building = clickedObject.GetComponent<Building>();
             var viewModel = new ViewModelBuildingData(building.buildingData);
@@ -50,12 +51,12 @@ namespace UI
 
         private void HideUIOnModeChange(Mode currentMode, Mode newMode)
         {
-            _root.style.display = DisplayStyle.None;
+            Hide();
         }
 
         private void HideUIOnCancel()
         {
-            _root.style.display = DisplayStyle.None;
+            Hide();
         }
     }
 }

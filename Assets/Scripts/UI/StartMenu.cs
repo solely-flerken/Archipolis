@@ -1,20 +1,20 @@
 using System.Collections.Generic;
 using Events;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace UI
 {
-    public class StartMenu : MonoBehaviour
+    public class StartMenu : UserInterfaceBase
     {
-        private VisualElement _root;
         private VisualElement _buttonContainer;
         private Dictionary<string, Button> _buttons = new();
 
-        private void OnEnable()
+        private void Start()
         {
-            _root = GetComponent<UIDocument>().rootVisualElement;
-            _buttonContainer = _root.Q<VisualElement>("buttonContainer");
+            IsVisibleInitially = true;
+            
+            Root = GetComponent<UIDocument>().rootVisualElement;
+            _buttonContainer = Root.Q<VisualElement>("buttonContainer");
 
             var buttons = _buttonContainer.Query<Button>().ToList();
             foreach (var button in buttons)

@@ -1,18 +1,18 @@
 using GameResources;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace UI
 {
-    public class ResourceInfo : MonoBehaviour
+    public class ResourceInfo : UserInterfaceBase
     {
-        private VisualElement _root;
         private VisualElement _container;
 
         private void Start()
         {
-            _root = GetComponent<UIDocument>().rootVisualElement;
-            _container = _root.Q<VisualElement>("container");
+            IsVisibleInitially = true;
+            
+            Root = GetComponent<UIDocument>().rootVisualElement;
+            _container = Root.Q<VisualElement>("container");
 
             var resources = ResourceManager.Resources;
             foreach (var resourceAmount in resources.Values)

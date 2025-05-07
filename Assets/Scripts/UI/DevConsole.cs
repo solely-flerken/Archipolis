@@ -7,12 +7,11 @@ using UnityEngine.UIElements;
 
 namespace UI
 {
-    public class DevConsole : MonoBehaviour
+    public class DevConsole : UserInterfaceBase
     {
         private static DevConsole _instance;
         private static bool _isEnabled;
 
-        private static VisualElement _root;
         private static ScrollView _scrollView;
         private static TextField _cmdInput;
         private static Button _cmdConfirm;
@@ -31,12 +30,14 @@ namespace UI
 
         private void Start()
         {
-            _root = GetComponent<UIDocument>().rootVisualElement;
-            _scrollView = _root.Q<ScrollView>("cmdView");
-            _cmdInput = _root.Q<TextField>("cmdInput");
-            _cmdConfirm = _root.Q<Button>("cmdConfirm");
+            IsVisibleInitially = false;
+            
+            Root = GetComponent<UIDocument>().rootVisualElement;
+            _scrollView = Root.Q<ScrollView>("cmdView");
+            _cmdInput = Root.Q<TextField>("cmdInput");
+            _cmdConfirm = Root.Q<Button>("cmdConfirm");
 
-            _root.style.display = DisplayStyle.None;
+            Root.style.display = DisplayStyle.None;
 
             _cmdInput.RegisterCallback<KeyDownEvent>(OnCmdInputKeyDown, TrickleDown.TrickleDown);
             _cmdConfirm.clicked += OnCommandSubmit;
@@ -74,7 +75,7 @@ namespace UI
         private void ToggleIsEnabled()
         {
             _isEnabled = !_isEnabled;
-            _root.style.display = _isEnabled ? DisplayStyle.Flex : DisplayStyle.None;
+            Root.style.display = _isEnabled ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
         private void ExecuteCommand(string command)

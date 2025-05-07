@@ -1,17 +1,18 @@
 using Buildings;
 using Events;
 using State;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace UI
 {
-    public class BuildMenu : MonoBehaviour
+    public class BuildMenu : UserInterfaceBase
     {
-        private void OnEnable()
+        private void Start()
         {
-            var root = GetComponent<UIDocument>().rootVisualElement;
-            var buttonContainer = root.Q<VisualElement>("primaryTools");
+            IsVisibleInitially = true;
+            
+            Root = GetComponent<UIDocument>().rootVisualElement;
+            var buttonContainer = Root.Q<VisualElement>("primaryTools");
 
             var allBuildings = BuildingDatabase.GetAllBuildings();
 
@@ -27,7 +28,7 @@ namespace UI
                 buttonContainer.Add(button);
             }
 
-            var deleteButton = root.Q<Button>("delete");
+            var deleteButton = Root.Q<Button>("delete");
             deleteButton.clicked += () =>
             {
                 if (ModeStateManager.Instance.ModeState == Mode.Bulldozing)
@@ -40,7 +41,7 @@ namespace UI
                 }
             };
 
-            var editButton = root.Q<Button>("edit");
+            var editButton = Root.Q<Button>("edit");
             editButton.clicked += () =>
             {
                 if (ModeStateManager.Instance.ModeState == Mode.Building)
