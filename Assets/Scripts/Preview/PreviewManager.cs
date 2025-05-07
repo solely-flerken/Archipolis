@@ -25,6 +25,7 @@ namespace Preview
             else
             {
                 Destroy(gameObject);
+                return;
             }
 
             _meshFilter = gameObject.AddComponent<MeshFilter>();

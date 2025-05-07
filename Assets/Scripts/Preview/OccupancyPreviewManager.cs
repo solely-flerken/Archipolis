@@ -26,6 +26,7 @@ namespace Preview
             else
             {
                 Destroy(gameObject);
+                return;
             }
 
             _hexTemplate = Util.GenerateHexagonMesh(MapGenerator.HexRadius, Color.white, MapGenerator.IsFlatTopped);
