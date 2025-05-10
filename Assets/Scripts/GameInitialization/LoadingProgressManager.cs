@@ -1,20 +1,42 @@
 ﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Collections;
 using UI;
 using UnityEngine;
 
 namespace GameInitialization
 {
-    public static class LoadingProgressManager
+    public class LoadingProgressManager : MonoBehaviour
     {
-        public static string LoadingMessage = "Initialising...";
+        public static LoadingProgressManager Instance;
+
+        public static string LoadingMessage = string.Empty;
         public static float SmoothProgress { get; private set; }
         public static float Progress { get; private set; }
 
-        private static CancellationTokenSource _cts;
+        private Coroutine _smoothProgressCoroutine;
 
-        public static void UpdateProgress(float newProgress)
+        private void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+            else
+            {
+                Destroy(gameObject);
+                return;
+            }
+        }
+
+        public void Reset()
+        {
+            StopSmoothing();
+            Progress = 0f;
+            SmoothProgress = 0f;
+            LoadingMessage = string.Empty;
+        }
+
+        public void UpdateProgress(float newProgress)
         {
             if (Mathf.Approximately(Progress, newProgress))
             {
@@ -22,49 +44,30 @@ namespace GameInitialization
             }
 
             Progress = newProgress;
-            StartSmoothing();
+
+            _smoothProgressCoroutine = StartCoroutine(SmoothProgressCoroutine());
         }
 
-        public static void Reset()
+        private static IEnumerator SmoothProgressCoroutine()
         {
-            _cts?.Cancel();
-            _cts?.Dispose();
-            _cts = null;
-
-            Progress = 0f;
-            SmoothProgress = 0f;
-        }
-
-        private static void StartSmoothing()
-        {
-            _cts?.Cancel(); // cancel any previous smoothing
-            _cts = new CancellationTokenSource();
-            var token = _cts.Token;
-
-            _ = SmoothToTargetAsync(token);
-        }
-
-        private static async Task SmoothToTargetAsync(CancellationToken token)
-        {
-            try
+            while (Math.Abs(SmoothProgress - Progress) > 0.1f)
             {
-                while (Math.Abs(SmoothProgress - Progress) > 0.1f)
-                {
-                    if (token.IsCancellationRequested)
-                    {
-                        return;
-                    }
-
-                    SmoothProgress = Mathf.MoveTowards(SmoothProgress, Progress, 1f);
-                    await Task.Delay(16, token); // (1000 / 16) = 60 fps
-                }
-
-                SmoothProgress = Progress;
+                SmoothProgress = Mathf.MoveTowards(SmoothProgress, Progress, 1);
+                yield return null;
             }
-            catch (TaskCanceledException)
+
+            SmoothProgress = Progress;
+        }
+
+        private void StopSmoothing()
+        {
+            if (_smoothProgressCoroutine == null)
             {
-                // Do nothing - smoothing was interrupted
+                return;
             }
+
+            StopCoroutine(_smoothProgressCoroutine);
+            _smoothProgressCoroutine = null;
         }
     }
 
@@ -72,7 +75,7 @@ namespace GameInitialization
     {
         public readonly BindableProperty<string> CurrentStatus =
             BindableProperty<string>.Bind(() => LoadingProgressManager.LoadingMessage);
-    
+
         public readonly BindableProperty<float> ProgressLerp =
             BindableProperty<float>.Bind(() => LoadingProgressManager.SmoothProgress);
     }
