@@ -13,7 +13,7 @@ namespace Save
 
         private ISaveSystem _saveSystem;
 
-        private void Start()
+        private void Awake()
         {
             if (Instance == null)
             {
@@ -44,16 +44,18 @@ namespace Save
             return filePath;
         }
 
-        public void LoadGame(string fileName)
+        public BaseSaveData LoadGame(string fileName)
         {
             var currentSaveData = _saveSystem.Load(fileName);
             EventSystem.Instance.InvokeLoadGame(currentSaveData);
+            return currentSaveData;
         }
 
-        public void LoadLatestGame()
+        public BaseSaveData LoadLatestGame()
         {
             var currentSaveData = _saveSystem.LoadLatest();
             EventSystem.Instance.InvokeLoadGame(currentSaveData);
+            return currentSaveData;
         }
 
         public void DeleteGame(string parameter)
