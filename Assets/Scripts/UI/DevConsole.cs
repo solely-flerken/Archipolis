@@ -3,6 +3,7 @@ using Events;
 using Save;
 using State;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 namespace UI
@@ -130,7 +131,8 @@ namespace UI
                         switch (parameter)
                         {
                             case "latest":
-                                SaveManager.Instance.LoadLatestGame();
+                                // TODO: Refactor
+                                SceneManager.LoadScene("Scenes/LoadingScene");
                                 LogMessage("Loaded latest save");
                                 break;
                             default:

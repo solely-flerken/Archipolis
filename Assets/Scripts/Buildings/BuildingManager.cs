@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Events;
@@ -11,6 +12,7 @@ using State;
 using UI;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Utils;
 
 namespace Buildings
@@ -35,6 +37,7 @@ namespace Buildings
             if (Instance == null)
             {
                 Instance = this;
+                // TODO: Refactor. Check all managers if they have to be DontDestroyOnLoad.
                 DontDestroyOnLoad(gameObject);
             }
             else
@@ -50,7 +53,6 @@ namespace Buildings
             EventSystem.Instance.OnBuildingPlaced += HandleBuildingPlaced;
             EventSystem.Instance.OnCancel += HandleCancel;
             EventSystem.Instance.OnKeyR += HandleBuildingRotate;
-            EventSystem.Instance.OnLoadGame += HandleLoadGame;
             EventSystem.Instance.OnModeChanged += HandleModeChange;
         }
 
@@ -89,8 +91,29 @@ namespace Buildings
             EventSystem.Instance.OnBuildingPlaced -= HandleBuildingPlaced;
             EventSystem.Instance.OnCancel -= HandleCancel;
             EventSystem.Instance.OnKeyR -= HandleBuildingRotate;
-            EventSystem.Instance.OnLoadGame -= HandleLoadGame;
             EventSystem.Instance.OnModeChanged -= HandleModeChange;
+        }
+
+        // TODO: Display accurate loading information
+        public IEnumerator Initialize(BaseSaveData saveData)
+        {
+            Buildings.ToList().Where(x => x).ToList().ForEach(building => DeleteBuilding(building.gameObject));
+            Buildings.Clear();
+            OccupiedTiles.Clear();
+            OccupancyPreviewManager.Instance.ClearPreviewHexes();
+
+            // TODO: Refactor this
+            foreach (var buildingData in saveData.buildings)
+            {
+                var createdBuilding = CreateBuilding(null, buildingData);
+                var buildingComponent = createdBuilding.GetComponent<Building>();
+
+                var newTissue = HexMapUtil.GetTissue(buildingData.origin, buildingData.footprint);
+                OccupyHexes(newTissue, buildingComponent);
+
+                Buildings.Add(buildingComponent);
+                yield return null;
+            }
         }
 
         #region Event subscriptions
@@ -104,7 +127,8 @@ namespace Buildings
             {
                 // Delete building
                 case Mode.Bulldozing:
-                    ConfirmationDialog.Instance.Show("Are you sure to delete this building?", () => { DeleteBuilding(obj); });
+                    ConfirmationDialog.Instance.Show("Are you sure to delete this building?",
+                        () => { DeleteBuilding(obj); });
                     break;
                 // Pick building up
                 case Mode.Building:
@@ -203,26 +227,6 @@ namespace Buildings
             _selectedBuilding.RotateFootprint();
         }
 
-        private void HandleLoadGame(BaseSaveData saveData)
-        {
-            Buildings.ToList().ForEach(building => DeleteBuilding(building.gameObject));
-            Buildings.Clear();
-            OccupiedTiles.Clear();
-            OccupancyPreviewManager.Instance.ClearPreviewHexes();
-
-            // TODO: Refactor this
-            foreach (var buildingData in saveData.buildings)
-            {
-                var createdBuilding = CreateBuilding(null, buildingData);
-                var buildingComponent = createdBuilding.GetComponent<Building>();
-
-                var newTissue = HexMapUtil.GetTissue(buildingData.origin, buildingData.footprint);
-                OccupyHexes(newTissue, buildingComponent);
-
-                Buildings.Add(buildingComponent);
-            }
-        }
-        
         private void HandleModeChange(Mode currentMode, Mode newMode)
         {
             if (currentMode == Mode.Placing)
@@ -321,6 +325,10 @@ namespace Buildings
             }
 
             var newBuilding = Instantiate(buildingBlueprint.prefab, position, Quaternion.identity);
+
+            // TODO: Refactor this
+            SceneManager.MoveGameObjectToScene(newBuilding, SceneManager.GetSceneByName("MainScene"));
+
             var buildingComponent = newBuilding.GetOrAddComponent<Building>();
             buildingComponent.Initialize(blueprint, buildingData);
 

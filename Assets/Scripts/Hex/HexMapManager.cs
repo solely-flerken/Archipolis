@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using Events;
+﻿using System.Collections;
+using System.Collections.Generic;
 using Save;
 using Terrain;
 using UnityEngine;
@@ -28,19 +28,14 @@ namespace Hex
         private void Start()
         {
             HexMap = MapGenerator.Instance.GenerateTerrainMesh();
-
-            EventSystem.Instance.OnLoadGame += HandleLoadGame;
         }
 
-        private void OnDestroy()
-        {
-            EventSystem.Instance.OnLoadGame += HandleLoadGame;
-        }
-
-        private void HandleLoadGame(BaseSaveData saveData)
+        // TODO: Display accurate loading information (in GenerateTerrainMesh which we need to make async)
+        public IEnumerator Initialize(BaseSaveData saveData)
         {
             MapGenerator.Instance.mapParameters = saveData.mapGenerationParameters;
             HexMap = MapGenerator.Instance.GenerateTerrainMesh();
+            yield return null;
         }
     }
 }

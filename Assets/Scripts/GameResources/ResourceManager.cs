@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Buildings;
-using Events;
 using Save;
 using UnityEngine;
 
@@ -33,12 +33,7 @@ namespace GameResources
                 Resources[resourceType] = new ResourceAmount(resourceType, 0f);
             }
         }
-
-        private void Start()
-        {
-            EventSystem.Instance.OnLoadGame += HandleGameLoad;
-        }
-
+        
         private void Update()
         {
             foreach (var building in BuildingManager.Buildings)
@@ -59,25 +54,18 @@ namespace GameResources
                 ResourceFlowTimers[key] = timer;
             }
         }
-
-        private void OnDestroy()
-        {
-            EventSystem.Instance.OnLoadGame -= HandleGameLoad;
-        }
-
-        #region Events
-
-        private static void HandleGameLoad(BaseSaveData saveData)
+        
+        // TODO: Display accurate loading information
+        public static IEnumerator Initialize(BaseSaveData saveData)
         {
             foreach (var resource in saveData.resources.Select(r => r.ToEntity()))
             {
                 Resources[resource.resourceType].amount = resource.amount;
+                yield return null;
             }
 
             ResourceFlowTimers = saveData.resourceFlowTimers.DeserializeToDictionary();
         }
-
-        #endregion
 
         #region Utility
 
