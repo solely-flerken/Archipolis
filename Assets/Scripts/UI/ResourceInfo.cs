@@ -14,6 +14,8 @@ namespace UI
             Root = GetComponent<UIDocument>().rootVisualElement;
             _container = Root.Q<VisualElement>("container");
 
+            Root.style.display = DisplayStyle.None;
+            
             var resources = ResourceManager.Resources;
             foreach (var resourceAmount in resources.Values)
             {

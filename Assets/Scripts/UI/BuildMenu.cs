@@ -14,6 +14,8 @@ namespace UI
             Root = GetComponent<UIDocument>().rootVisualElement;
             var buttonContainer = Root.Q<VisualElement>("primaryTools");
 
+            Root.style.display = DisplayStyle.None;
+            
             var allBuildings = BuildingDatabase.GetAllBuildings();
 
             foreach (var building in allBuildings)
