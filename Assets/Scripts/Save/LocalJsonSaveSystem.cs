@@ -44,20 +44,20 @@ namespace Save
             return JsonUtility.FromJson<BaseSaveData>(json);
         }
 
-        public BaseSaveData LoadLatest()
+        public string GetLatestSaveFile()
         {
-            var saveFiles = GetAllSaveFiles();
+            var saveFiles = GetSaveFiles();
 
             if (saveFiles.Length == 0)
             {
-                return new BaseSaveData();
+                return null;
             }
 
             var latestSaveFile = saveFiles
                 .OrderByDescending(File.GetLastWriteTime)
                 .First();
 
-            return Load(latestSaveFile);
+            return latestSaveFile;
         }
 
         public bool Delete(string fileName)
@@ -68,17 +68,17 @@ namespace Save
             }
 
             var savePath = ToSavePath(fileName);
-            
+
             if (!File.Exists(savePath))
             {
                 return false;
             }
-            
+
             File.Delete(savePath);
             return true;
         }
 
-        private string[] GetAllSaveFiles()
+        public string[] GetSaveFiles()
         {
             if (!Directory.Exists(SaveDirectory))
             {
@@ -86,6 +86,16 @@ namespace Save
             }
 
             return Directory.GetFiles(SaveDirectory, "*.json");
+        }
+
+        public bool HasAnySave()
+        {
+            return GetSaveFiles().Length > 0;
+        }
+
+        public bool SaveExists(string fileName)
+        {
+            return File.Exists(ToSavePath(fileName));
         }
 
         private static string ToSavePath(string fileName)

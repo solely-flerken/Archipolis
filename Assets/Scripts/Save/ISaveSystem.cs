@@ -4,7 +4,10 @@
     {
         string Save(BaseSaveData saveData, string fileName);
         BaseSaveData Load(string fileName);
-        BaseSaveData LoadLatest();
+        string GetLatestSaveFile();
         bool Delete(string fileName);
+        string[] GetSaveFiles();
+        public bool HasAnySave();
+        public bool SaveExists(string fileName);
     }
 }

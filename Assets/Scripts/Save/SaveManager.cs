@@ -8,7 +8,7 @@ namespace Save
 {
     public static class SaveManager
     {
-        private static readonly ISaveSystem SaveSystem = new LocalJsonSaveSystem();
+        public static readonly ISaveSystem SaveSystem = new LocalJsonSaveSystem();
 
         public static string SaveGame(string fileName = null)
         {
@@ -28,14 +28,13 @@ namespace Save
         public static BaseSaveData LoadGame(string fileName)
         {
             var currentSaveData = SaveSystem.Load(fileName);
-            EventSystem.Instance.InvokeLoadGame(currentSaveData);
             return currentSaveData;
         }
 
         public static BaseSaveData LoadLatestGame()
         {
-            var currentSaveData = SaveSystem.LoadLatest();
-            EventSystem.Instance.InvokeLoadGame(currentSaveData);
+            var latestSaveFile = SaveSystem.GetLatestSaveFile();
+            var currentSaveData = SaveSystem.Load(latestSaveFile);
             return currentSaveData;
         }
 
