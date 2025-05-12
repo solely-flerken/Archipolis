@@ -122,7 +122,7 @@ namespace UI
                     LogMessage($"Current mode: {ModeStateManager.Instance.ModeState}");
                     break;
                 case "/save":
-                    var filePath = SaveManager.Instance.SaveGame(parameter);
+                    var filePath = SaveManager.SaveGame(parameter);
                     LogMessage(filePath);
                     break;
                 case "/load":
@@ -136,7 +136,7 @@ namespace UI
                                 LogMessage("Loaded latest save");
                                 break;
                             default:
-                                SaveManager.Instance.LoadGame(parameter);
+                                SaveManager.LoadGame(parameter);
                                 LogMessage($"Loaded save: {parameter}");
                                 break;
                         }
@@ -150,7 +150,7 @@ namespace UI
                 case "/delete":
                     if (parameter != null)
                     {
-                        SaveManager.Instance.DeleteGame(parameter);
+                        SaveManager.DeleteGame(parameter);
                         LogMessage($"Deleted save: {parameter}");
                     }
                     else
@@ -173,12 +173,12 @@ namespace UI
             ScrollToBottom();
         }
 
-        private void ClearConsole()
+        private static void ClearConsole()
         {
             _scrollView.contentContainer.Clear();
         }
 
-        private void ScrollToBottom()
+        private static void ScrollToBottom()
         {
             _scrollView.scrollOffset = new Vector2(0, _scrollView.contentContainer.resolvedStyle.height);
         }

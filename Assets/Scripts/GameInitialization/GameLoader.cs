@@ -29,7 +29,7 @@ namespace GameInitialization
         public static IEnumerator LoadGame()
         {
             LoadingProgressManager.LoadingMessage = "Loading save...";
-            var saveData = SaveManager.Instance.LoadLatestGame();
+            var saveData = SaveManager.LoadLatestGame();
             LoadingProgressManager.Instance.UpdateProgress(20f);
             yield return new WaitForSeconds(1f);;
             

@@ -3,33 +3,14 @@ using Buildings;
 using Events;
 using GameResources;
 using Terrain;
-using UnityEngine;
 
 namespace Save
 {
-    public class SaveManager : MonoBehaviour
+    public static class SaveManager
     {
-        public static SaveManager Instance { get; private set; }
+        private static readonly ISaveSystem SaveSystem = new LocalJsonSaveSystem();
 
-        private ISaveSystem _saveSystem;
-
-        private void Awake()
-        {
-            if (Instance == null)
-            {
-                Instance = this;
-                DontDestroyOnLoad(gameObject);
-
-                // TODO: We want to use a database later
-                _saveSystem = new LocalJsonSaveSystem();
-            }
-            else
-            {
-                Destroy(gameObject);
-            }
-        }
-
-        public string SaveGame(string fileName = null)
+        public static string SaveGame(string fileName = null)
         {
             var currentSaveData = new BaseSaveData
             {
@@ -39,28 +20,28 @@ namespace Save
                 mapGenerationParameters = MapGenerator.Instance.mapParameters
             };
 
-            var filePath = _saveSystem.Save(currentSaveData, fileName);
+            var filePath = SaveSystem.Save(currentSaveData, fileName);
             EventSystem.Instance.InvokeSaveGame(currentSaveData);
             return filePath;
         }
 
-        public BaseSaveData LoadGame(string fileName)
+        public static BaseSaveData LoadGame(string fileName)
         {
-            var currentSaveData = _saveSystem.Load(fileName);
+            var currentSaveData = SaveSystem.Load(fileName);
             EventSystem.Instance.InvokeLoadGame(currentSaveData);
             return currentSaveData;
         }
 
-        public BaseSaveData LoadLatestGame()
+        public static BaseSaveData LoadLatestGame()
         {
-            var currentSaveData = _saveSystem.LoadLatest();
+            var currentSaveData = SaveSystem.LoadLatest();
             EventSystem.Instance.InvokeLoadGame(currentSaveData);
             return currentSaveData;
         }
 
-        public void DeleteGame(string parameter)
+        public static void DeleteGame(string parameter)
         {
-            _saveSystem.Delete(parameter);
+            SaveSystem.Delete(parameter);
         }
     }
 }
