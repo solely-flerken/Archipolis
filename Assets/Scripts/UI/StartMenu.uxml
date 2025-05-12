@@ -1,10 +1,12 @@
 <engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
-    <engine:VisualElement name="menu" style="flex-grow: 1; width: 20%; background-color: rgba(71, 75, 78, 0.39); border-right-width: 1px; border-right-color: rgb(150, 75, 0); justify-content: flex-end;">
-        <engine:VisualElement name="buttonContainer" style="flex-grow: 0; background-size: 100% 50%; height: 50%; justify-content: center; padding-top: 5%; padding-right: 5%; padding-bottom: 5%; padding-left: 5%; font-size: 32px;">
-            <engine:Button text="Continue" name="continue" />
-            <engine:Button text="Load Game" name="load" />
-            <engine:Button text="New Game" name="newGame" />
-            <engine:Button text="Exit" name="exit" />
+    <engine:VisualElement name="container" style="flex-grow: 0; flex-direction: row; height: 100%;">
+        <engine:VisualElement name="menu" style="flex-grow: 0; width: 20%; background-color: rgba(71, 75, 78, 0.39); border-right-width: 1px; border-right-color: rgb(150, 75, 0); justify-content: flex-end;">
+            <engine:VisualElement name="buttonContainer" style="flex-grow: 0; background-size: 100% 50%; height: 50%; justify-content: center; padding-top: 5%; padding-right: 5%; padding-bottom: 5%; padding-left: 5%; font-size: 32px;">
+                <engine:Button text="Continue" name="continue" />
+                <engine:Button text="Load Game" name="load" />
+                <engine:Button text="New Game" name="newGame" />
+                <engine:Button text="Exit" name="exit" />
+            </engine:VisualElement>
         </engine:VisualElement>
     </engine:VisualElement>
 </engine:UXML>

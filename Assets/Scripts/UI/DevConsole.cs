@@ -3,7 +3,6 @@ using Events;
 using Save;
 using State;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 namespace UI
@@ -32,7 +31,7 @@ namespace UI
         private void Start()
         {
             IsVisibleInitially = false;
-            
+
             Root = GetComponent<UIDocument>().rootVisualElement;
             _scrollView = Root.Q<ScrollView>("cmdView");
             _cmdInput = Root.Q<TextField>("cmdInput");
@@ -128,17 +127,20 @@ namespace UI
                 case "/load":
                     if (parameter != null)
                     {
-                        switch (parameter)
+                        var exists = parameter == "latest"
+                            ? SaveManager.SaveSystem.HasAnySave()
+                            : SaveManager.SaveSystem.SaveExists(parameter);
+
+                        var saveFile = parameter == "latest" ? string.Empty : parameter;
+                        
+                        if (!exists)
                         {
-                            case "latest":
-                                // TODO: Refactor
-                                SceneManager.LoadScene("Scenes/LoadingScene");
-                                LogMessage("Loaded latest save");
-                                break;
-                            default:
-                                SaveManager.LoadGame(parameter);
-                                LogMessage($"Loaded save: {parameter}");
-                                break;
+                            LogMessage("Save does not exist");
+                        }
+                        else
+                        {
+                            EventSystem.Instance.InvokeLoadGame(saveFile);
+                            LogMessage($"Loading save: {parameter}");
                         }
                     }
                     else

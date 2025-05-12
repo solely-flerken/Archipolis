@@ -46,7 +46,7 @@ namespace Events
 
         // Save
         public event Action<BaseSaveData> OnSaveGame;
-        public event Action<BaseSaveData> OnLoadGame;
+        public event Action<string> OnLoadGame;
 
         // Building
         public event Action<GameObject> OnClickableClick;
@@ -148,9 +148,9 @@ namespace Events
             OnSaveGame?.Invoke(saveData);
         }
 
-        public void InvokeLoadGame(BaseSaveData saveData)
+        public void InvokeLoadGame(string saveFile)
         {
-            OnLoadGame?.Invoke(saveData);
+            OnLoadGame?.Invoke(saveFile);
         }
     }
 }
