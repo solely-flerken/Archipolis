@@ -6,7 +6,7 @@
                 <engine:Button text="Continue" name="continue" />
                 <engine:Button text="Load Game" name="load" />
                 <engine:Button text="New Game" name="newGame" />
-                <engine:Button text="Exit" name="exit" />
+                <engine:Button text="Quit" name="quit" />
             </engine:VisualElement>
         </engine:VisualElement>
     </engine:VisualElement>

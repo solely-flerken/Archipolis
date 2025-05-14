@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Events;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace UI
@@ -48,8 +49,21 @@ namespace UI
                     _container.Add(_saveFileView);
                 }
             }
+            else if (buttonName == "quit")
+            {
+                ConfirmationDialog.Instance.Show("Are you sure you want to quit?", Quit);
+            }
 
             EventSystem.Instance.InvokeButtonClick(buttonName);
+        }
+
+        private static void Quit()
+        {
+            Application.Quit();
+
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#endif
         }
     }
 }
