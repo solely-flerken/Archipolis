@@ -44,22 +44,6 @@ namespace Save
             return JsonUtility.FromJson<BaseSaveData>(json);
         }
 
-        public string GetLatestSaveFile()
-        {
-            var saveFiles = GetSaveFiles();
-
-            if (saveFiles.Length == 0)
-            {
-                return null;
-            }
-
-            var latestSaveFile = saveFiles
-                .OrderByDescending(File.GetLastWriteTime)
-                .First();
-
-            return latestSaveFile;
-        }
-
         public bool Delete(string fileName)
         {
             if (string.IsNullOrEmpty(fileName))
@@ -85,9 +69,14 @@ namespace Save
                 return Array.Empty<string>();
             }
 
-            return Directory.GetFiles(SaveDirectory, "*.json");
+            return Directory.GetFiles(SaveDirectory, "*.json").Select(Path.GetFileName).ToArray();
         }
-
+        
+        public string GetLatestSaveFile()
+        {
+            return GetSaveFiles().OrderByDescending(File.GetLastWriteTime).ToArray().FirstOrDefault();
+        }
+        
         public bool HasAnySave()
         {
             return GetSaveFiles().Length > 0;
