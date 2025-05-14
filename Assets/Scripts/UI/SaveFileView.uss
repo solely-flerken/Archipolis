@@ -1,0 +1,7 @@
+SaveFileView {
+    width: 80%;
+    padding: 10%;
+    font-size: 32px;
+
+    background-color: rgba(71, 75, 78, 0.39);
+}
