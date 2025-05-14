@@ -1,9 +1,11 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <ui:VisualElement name="body" style="flex-grow: 1; align-items: center; justify-content: center; align-content: center;">
-        <ui:VisualElement name="container" style="flex-grow: 0; align-items: center; justify-content: center; align-content: center; width: 360px; height: 240px; background-color: rgb(33, 33, 33);">
-            <ui:Label text="Are you sure?" name="label" />
-            <ui:Button text="Yes" name="confirm" />
-            <ui:Button text="No" name="deny" />
+        <ui:VisualElement name="container" style="flex-grow: 0; align-items: center; align-content: stretch; width: 360px; height: 240px; background-color: rgba(71, 75, 78, 0.39); border-top-left-radius: 18px; border-top-right-radius: 18px; border-bottom-right-radius: 18px; border-bottom-left-radius: 18px; border-left-color: rgb(150, 75, 0); border-right-color: rgb(150, 75, 0); border-top-color: rgb(150, 75, 0); border-bottom-color: rgb(150, 75, 0); border-top-width: 1px; border-right-width: 1px; border-bottom-width: 1px; border-left-width: 1px; align-self: auto; justify-content: center; font-size: 32px;">
+            <ui:Label text="Are you sure?" name="label" style="color: rgb(255, 255, 255); white-space: normal; -unity-text-align: upper-center;" />
+            <ui:VisualElement style="flex-grow: 0; flex-direction: row;">
+                <ui:Button text="Yes" name="confirm" />
+                <ui:Button text="No" name="deny" />
+            </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
