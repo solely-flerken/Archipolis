@@ -11,6 +11,7 @@ namespace Buildings
     {
         public string identifier = Guid.NewGuid().ToString();
         public string buildingName;
+        public Sprite icon;
         public GameObject prefab;
         public HexCoordinate[] footprint = { new(0, 0) };
         public List<ResourceAmount> buildingCosts;

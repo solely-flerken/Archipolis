@@ -1,9 +1,19 @@
-.button {
-    width: 150px;
-    background-color: rgb(0, 168, 255);
-    border-width: 4px;
-    border-color: rgb(0, 100, 255);
-    border-radius: 24px;
+.building-button {
+    width: 64px;
+    height: 64px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 18px;
+}
+
+.building-icon {
+    width: 64px;
+    height: 64px;
+    -unity-background-scale-mode: scale-to-fit;
+}
+
+.building-label {
 }
 
 .customScrollView .unity-scroll-view__content-and-vertical-scroll-container {

@@ -1,6 +1,7 @@
 using Buildings;
 using Events;
 using State;
+using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace UI
@@ -10,23 +11,41 @@ namespace UI
         private void Start()
         {
             IsVisibleInitially = true;
-            
+
             Root = GetComponent<UIDocument>().rootVisualElement;
             var buttonContainer = Root.Q<VisualElement>("primaryTools");
 
             Root.style.display = DisplayStyle.None;
-            
+
             var allBuildings = BuildingDatabase.GetAllBuildings();
 
             foreach (var building in allBuildings)
             {
+                var hasIcon = building.icon != null;
+
                 var button = new Button(() => { EventSystem.Instance.InvokeOnPlaceBuildingUI(building.identifier); })
                 {
-                    text = building.buildingName,
                     name = "build-" + building.identifier
                 };
+                button.AddToClassList("building-button");
 
-                button.AddToClassList("button");
+                if (hasIcon)
+                {
+                    var imageElement = new Image
+                    {
+                        sprite = building.icon,
+                        scaleMode = ScaleMode.ScaleToFit,
+                    };
+                    imageElement.AddToClassList("building-icon");
+                    button.Add(imageElement);
+                }
+                else
+                {
+                    var label = new Label(building.buildingName);
+                    label.AddToClassList("building-label");
+                    button.Add(label);
+                }
+
                 buttonContainer.Add(button);
             }
 
