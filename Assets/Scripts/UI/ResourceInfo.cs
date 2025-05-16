@@ -41,7 +41,7 @@ namespace UI
 
                     var imageElement = new Image
                     {
-                        image = resourceType.icon.texture,
+                        sprite = resourceType.icon,
                         scaleMode = ScaleMode.ScaleToFit,
                         style =
                         {
