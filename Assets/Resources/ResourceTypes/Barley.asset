@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a89c7947ac2e40e181634574429845f7, type: 3}
-  m_Name: SilverCoins
+  m_Name: Barley
   m_EditorClassIdentifier: 
-  identifier: aa50baac-446a-4fb2-81af-302f7949cdee
-  resourceName: Silver Coins
-  category: 0
-  icon: {fileID: -1225467794, guid: f33c015a60980764982faa50142871c3, type: 3}
+  identifier: aed817e8-2b3e-4608-890e-bd5bb0a4010a
+  resourceName: Barley
+  category: 2
+  icon: {fileID: 1151668326, guid: f33c015a60980764982faa50142871c3, type: 3}
