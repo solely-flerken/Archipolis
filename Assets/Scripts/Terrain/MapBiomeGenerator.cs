@@ -7,29 +7,30 @@ namespace Terrain
     public struct MapBiomeGenerator : IJobParallelFor
     {
         [ReadOnly] private NativeArray<float3> _positions;
+        [ReadOnly] private NativeArray<float2> _octaveOffsets;
         [WriteOnly] private NativeArray<BiomeType> _biomeMap;
         [WriteOnly] private NativeArray<float> _heightMap;
 
         private readonly MapGenerationParameters _parameters;
         private readonly float2 _mapCenter;
         private readonly float _mapRadius;
-        private readonly float2 _seedOffset;
+        private readonly float _offsetSpeed;
 
         public MapBiomeGenerator(MapGenerationParameters parameters, NativeArray<float3> positions,
+            NativeArray<float2> octaveOffsets,
             NativeArray<BiomeType> biomeMap, NativeArray<float> heightMap,
             float2 mapCenter, float mapRadius)
         {
             _positions = positions;
+            _octaveOffsets = octaveOffsets;
             _biomeMap = biomeMap;
             _heightMap = heightMap;
             _parameters = parameters;
             _mapCenter = mapCenter;
             _mapRadius = mapRadius;
 
-            _seedOffset = new float2(
-                math.sin(_parameters.seed * 12.9898f) * 43758.5453f % 1f,
-                math.sin(_parameters.seed * 78.233f) * 43758.5453f % 1f
-            ) * 10000f;
+            // a unit equals an offset of 1/10 the map radius
+            _offsetSpeed = _mapRadius / 10;
         }
 
         public void Execute(int index)
@@ -48,117 +49,69 @@ namespace Terrain
 
         private float GenerateHeight(float2 pos)
         {
-            // Generate base continent shape with falloff from center
-            var falloff = FalloffMap(pos - _mapCenter, _mapRadius);
+            var n = 0f;
+            var frequency = 1f;
+            var amplitude = 1f;
+            var totalAmplitude = 0f;
+            var scale = _parameters.scale;
 
-            // Generate main noise
-            var mainNoise = OctavedSimplexNoise(pos, _parameters.mainNoiseScale);
-
-            // Generate ridge noise for mountains
-            var ridgeNoise = OctavedRidgeNoise(pos, _parameters.ridgeNoiseScale);
-
-            // Blend noise types
-            var blendedNoise = math.lerp(mainNoise, ridgeNoise, _parameters.ridgeInfluence);
-
-            // Create more distinct elevation levels
-            var combinedNoise = math.pow(blendedNoise * falloff, _parameters.heightCurve);
-
-            return combinedNoise;
-        }
-
-        private float OctavedSimplexNoise(float2 pos, float noiseScale)
-        {
-            float noiseVal = 0;
-            float amplitude = 1;
-            float normalization = 0;
-            var currentFreq = noiseScale;
-
-            for (var o = 0; o < _parameters.octaves; o++)
+            // Main noise generation
+            for (var i = 0; i < _parameters.octaves; i++)
             {
-                // Get simplex noise and normalize to 0-1
-                var n = (noise.snoise((pos + _seedOffset) / currentFreq) + 1) * 0.5f;
+                // Calculate noise at this octave
+                n += amplitude * noise.snoise((pos + _parameters.offset * _offsetSpeed) / scale * frequency +
+                                              _octaveOffsets[i]);
 
-                // Track normalization
-                normalization += amplitude;
+                // Keep track of total amplitude for normalization
+                totalAmplitude += amplitude;
 
-                // Add to total
-                noiseVal += n * amplitude;
-
-                // Update frequency and amplitude for next octave
-                currentFreq /= _parameters.frequency;
-                amplitude /= _parameters.lacunarity;
+                amplitude *= _parameters.persistence;
+                frequency *= _parameters.lacunarity;
             }
 
-            // Normalize result to 0-1 range
-            return noiseVal / normalization;
-        }
+            n /= totalAmplitude;
 
-        private float OctavedRidgeNoise(float2 pos, float noiseScale)
-        {
-            float noiseVal = 0;
-            float amplitude = 1;
-            float weight = 1;
-            float normalization = 0;
-            var currentFreq = noiseScale;
+            // Normalize to [0,1]
+            n = n * 0.5f + 0.5f;
 
-            for (var o = 0; o < _parameters.octaves; o++)
-            {
-                // Get ridge noise
-                var n = 1 - math.abs(noise.snoise((pos + _seedOffset) / currentFreq));
-                n *= n; // Square for sharper ridges
-                n *= weight;
+            // Falloff
+            const float a = 3f;
+            var b = _parameters.falloffSharpness;
+            // Normalized distance
+            var d = math.length(pos - _mapCenter) / _mapRadius;
+            var falloff = math.pow(d, a) / (math.pow(d, a) + math.pow(b - b * d, a));
+            n = math.lerp(n, n - falloff, _parameters.falloffInfluence);
+            n = math.saturate(n);
 
-                // Track normalization
-                normalization += amplitude;
+            // terrainSharpnessExponent > 1 -> sharpens (emphasizes peaks, flattens valleys).
+            // terrainSharpnessExponent < 1 -> flattens (lifts valleys, smooths peaks).
+            n = math.pow(n, _parameters.terrainSharpnessExponent);
 
-                // Add to total
-                noiseVal += n * amplitude;
-
-                // Update weight for next octave
-                weight = math.clamp(n * 2, 0, 1);
-
-                // Update frequency and amplitude for next octave
-                currentFreq /= _parameters.frequency;
-                amplitude /= _parameters.lacunarity;
-            }
-
-            // Normalize result to 0-1 range
-            return noiseVal / normalization;
-        }
-
-        private float FalloffMap(float2 distanceFromCenter, float radius)
-        {
-            // Calculate normalized distance from center (0-1 range)
-            var distanceNormalized = math.length(distanceFromCenter) / radius;
-
-            // Apply falloff curve - more land near center, falls off toward edges
-            if (distanceNormalized > 1)
-            {
-                return 0;
-            }
-
-            // Apply falloff curve
-            return 1 - math.pow(distanceNormalized, _parameters.falloffSteepness);
+            return n;
         }
 
         private BiomeType DetermineBiomeFromHeight(float height)
         {
             // Determine biome based solely on height
-            if (height < _parameters.deepOceanThreshold)
+            if (height < 0)
+                return BiomeType.Unknown;
+            if (height <= _parameters.deepOcean)
                 return BiomeType.DeepOcean;
-            if (height < _parameters.oceanThreshold)
+            if (height <= _parameters.ocean)
                 return BiomeType.ShallowOcean;
-            if (height < _parameters.beachThreshold)
+            if (height <= _parameters.beach)
                 return BiomeType.Beach;
-            if (height < _parameters.plainsThreshold)
+            if (height <= _parameters.plains)
                 return BiomeType.Plains;
-            if (height < _parameters.forestThreshold)
+            if (height <= _parameters.forest)
                 return BiomeType.Forest;
-            if (height < _parameters.hillsThreshold)
+            if (height <= _parameters.hills)
                 return BiomeType.Hills;
-            if (height < _parameters.mountainsThreshold)
+            if (height <= _parameters.mountains)
                 return BiomeType.Mountains;
-            return BiomeType.Peaks;
+            if (height <= _parameters.peaks)
+                return BiomeType.Peaks;
+            return BiomeType.Unknown;
         }
     }
 }

@@ -6,6 +6,7 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEditor;
 using UnityEngine;
+using Random = Unity.Mathematics.Random;
 
 namespace Terrain
 {
@@ -13,18 +14,17 @@ namespace Terrain
     {
         public static MapGenerator Instance;
 
-        private ChunkPool _chunkPool;
-
-        [SerializeField] private Material chunkMaterial;
-
-        [Header("Chunk Settings")] [SerializeField]
-        private int initialPoolSize = 10;
-
-        [SerializeField] private int expandAmount = 1;
-
         public const float HexRadius = 5f;
         public const bool IsFlatTopped = false;
+        
+        private ChunkPool _chunkPool;
+        
+        [SerializeField] private Material chunkMaterial;
 
+        [Header("Chunk Settings")] 
+        [SerializeField] private int initialPoolSize = 10;
+        [SerializeField] private int expandAmount = 1;
+        
         public MapGenerationParameters mapParameters = MapGenerationParameters.Default();
 
         private void Awake()
@@ -77,9 +77,20 @@ namespace Terrain
 
             var mapCenter = Util.CalculateMapCenter(worldPositions);
             var mapRadius = Util.CalculateMapRadius(worldPositions, mapCenter);
-
+            
+            var random = new Random(mapParameters.seed);
+            var octaveOffsets = new NativeArray<float2>(mapParameters.octaves, Allocator.TempJob);
+            for (var i = 0; i < mapParameters.octaves; i++)
+            {
+                var offset = new float2(
+                    random.NextFloat(-100000, 100000),
+                    random.NextFloat(-100000, 100000)
+                );
+                octaveOffsets[i] = offset;
+            }
+            
             var generateTerrain =
-                new MapBiomeGenerator(mapParameters, worldPositions, biomeMap, heightMap, mapCenter, mapRadius);
+                new MapBiomeGenerator(mapParameters, worldPositions, octaveOffsets, biomeMap, heightMap, mapCenter, mapRadius);
             generateTerrain.Schedule(hexCount, 64).Complete();
 
             // Prepare hex mesh template data
@@ -121,7 +132,7 @@ namespace Terrain
                     hexIndices[i] = hexIndexLookup[hexList[i].hexPos];
                 }
 
-                var meshJob = new HexMeshJob
+                var generateMesh = new HexMeshJob
                 {
                     BiomeMap = biomeMap,
                     Positions = worldPositions,
@@ -133,9 +144,9 @@ namespace Terrain
                     HexIndices = hexIndices,
                 };
 
-                meshJob.Schedule(chunkHexCount, 64).Complete();
+                generateMesh.Schedule(chunkHexCount, 64).Complete();
 
-                var mesh = meshJob.ToMesh();
+                var mesh = generateMesh.ToMesh();
 
                 _chunkPool.GetChunk(mesh);
 
@@ -159,6 +170,7 @@ namespace Terrain
 
             // Dispose global data
             worldPositions.Dispose();
+            octaveOffsets.Dispose();
             biomeMap.Dispose();
             heightMap.Dispose();
             baseVertices.Dispose();

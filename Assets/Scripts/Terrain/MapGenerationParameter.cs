@@ -1,4 +1,5 @@
 ﻿using System;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Terrain
@@ -6,73 +7,71 @@ namespace Terrain
     [Serializable]
     public struct MapGenerationParameters
     {
-        [Header("General Map Settings")] public int gridRadius;
+        [Header("Map Settings")] 
+        public int gridRadius;
         public bool useCircularShape;
         [Range(1f, 2f)] public float circleFactor;
 
-        [Header("Chunk Settings")] public int chunkSize;
+        [Header("Chunk Settings")] 
+        public int chunkSize;
 
-        [Header("Generation Seed")] [Tooltip("Seed for random generation")]
+        [Header("Generation Seed")] 
         public uint seed;
+        public float2 offset;
 
-        [Header("General Noise Settings")]
-        [Tooltip("Number of noise layers to combine - higher values add more detail")]
+        [Header("Noise Settings")] 
         public int octaves;
-
-        [Tooltip("How noise frequency changes between octaves - affects detail variation")]
-        public float frequency;
-
-        [Tooltip("How amplitude changes between octaves - affects detail prominence")]
+        public float scale;
+        public float persistence;
         public float lacunarity;
-
-        [Header("Main Island Settings")]
-        [Tooltip("Base scale of the main noise pattern - larger values create smoother terrain")]
-        public float mainNoiseScale;
-
-        [Tooltip("Scale of ridge noise for mountains - affects mountain spacing")]
-        public float ridgeNoiseScale;
-
-        [Range(0, 1)] [Tooltip("How much ridge noise affects terrain - higher values create more mountains")]
-        public float ridgeInfluence;
-
-        [Tooltip("How quickly terrain drops from center to edge - shapes island outline")]
-        public float falloffSteepness;
-
-        [Tooltip("Power function for elevation - higher values create more distinct levels")]
-        public float heightCurve;
-
-        [Range(0, 1)] public float deepOceanThreshold;
-        [Range(0, 1)] public float oceanThreshold;
-        [Range(0, 1)] public float beachThreshold;
-        [Range(0, 1)] public float plainsThreshold;
-        [Range(0, 1)] public float forestThreshold;
-        [Range(0, 1)] public float hillsThreshold;
-        [Range(0, 1)] public float mountainsThreshold;
+        [Range(0, 1)] public float falloffInfluence;
+        public float falloffSharpness;
+        [Min(0)] public float terrainSharpnessExponent;
+        
+        [Header("Biome Thresholds")] 
+        [Range(0, 1)] public float deepOcean;
+        [Range(0, 1)] public float ocean;
+        [Range(0, 1)] public float beach;
+        [Range(0, 1)] public float plains;
+        [Range(0, 1)] public float forest;
+        [Range(0, 1)] public float hills;
+        [Range(0, 1)] public float mountains;
+        [Range(0, 1)] public float peaks;
 
         public static MapGenerationParameters Default()
         {
             return new MapGenerationParameters
             {
+                // Map Settings
                 gridRadius = 40,
                 useCircularShape = false,
                 circleFactor = 1.5f,
+                
+                // Chunk Settings
                 chunkSize = 32,
+                
+                // Seed
                 seed = 509,
-                octaves = 6,
-                frequency = 15,
-                lacunarity = 40,
-                mainNoiseScale = 450,
-                ridgeNoiseScale = 1,
-                ridgeInfluence = 0,
-                falloffSteepness = 1.5f,
-                heightCurve = 0.7f,
-                deepOceanThreshold = 0.2f,
-                oceanThreshold = 0.3f,
-                beachThreshold = 0.35f,
-                plainsThreshold = 0.5f,
-                forestThreshold = 0.85f,
-                hillsThreshold = 0.86f,
-                mountainsThreshold = 1f
+                offset = new float2(0, 0),
+                
+                // Noise Settings
+                octaves = 4,
+                scale = 400,
+                persistence = 0.5f,
+                lacunarity = 2,
+                falloffInfluence = 0.7f,
+                falloffSharpness = 3,
+                terrainSharpnessExponent = 1,
+                
+                // Biome Thresholds
+                deepOcean = 0.2f,
+                ocean = 0.3f,
+                beach = 0.35f,
+                plains = 0.5f,
+                forest = 0.7f,
+                hills = 0.75f,
+                mountains = 0.8f,
+                peaks = 1f
             };
         }
     }

@@ -66,7 +66,7 @@ namespace Terrain
                 BiomeType.Hills => HillsColor,
                 BiomeType.Mountains => MountainColor,
                 BiomeType.Peaks => PeakColor,
-                _ => Color.white
+                _ => Color.black
             };
         }
 

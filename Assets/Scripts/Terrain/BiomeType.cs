@@ -9,6 +9,7 @@
         Forest,
         Hills,
         Mountains,
-        Peaks
+        Peaks,
+        Unknown
     }
 }
