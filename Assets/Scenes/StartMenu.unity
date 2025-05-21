@@ -519,26 +519,29 @@ MonoBehaviour:
   initialPoolSize: 10
   expandAmount: 1
   mapParameters:
-    gridRadius: 50
+    gridRadius: 40
     useCircularShape: 0
     circleFactor: 1.5
-    chunkSize: 40
-    seed: 745
-    octaves: 6
-    frequency: 15
-    lacunarity: 40
-    mainNoiseScale: 450
-    ridgeNoiseScale: 1
-    ridgeInfluence: 0
-    falloffSteepness: 1.5
-    heightCurve: 0.7
-    deepOceanThreshold: 0.2
-    oceanThreshold: 0.3
-    beachThreshold: 0.35
-    plainsThreshold: 0.5
-    forestThreshold: 0.85
-    hillsThreshold: 0.86
-    mountainsThreshold: 1
+    chunkSize: 32
+    seed: 509
+    offset:
+      x: 0
+      y: 0
+    octaves: 4
+    scale: 400
+    persistence: 0.5
+    lacunarity: 2
+    falloffInfluence: 0.7
+    falloffSharpness: 3
+    terrainSharpnessExponent: 1
+    deepOcean: 0.2
+    ocean: 0.3
+    beach: 0.35
+    plains: 0.5
+    forest: 0.7
+    hills: 0.75
+    mountains: 0.8
+    peaks: 1
 --- !u!4 &1408566470
 Transform:
   m_ObjectHideFlags: 0
