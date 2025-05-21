@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Events;
+using GameInitialization;
 using GameResources;
 using Hex;
 using Input;
@@ -102,9 +103,14 @@ namespace Buildings
             OccupiedTiles.Clear();
             OccupancyPreviewManager.Instance.ClearPreviewHexes();
 
+            var totalBuildings = saveData.buildings.Count;
+            
             // TODO: Refactor this
-            foreach (var buildingData in saveData.buildings)
+            for (var index = 0; index < totalBuildings; index++)
             {
+                var buildingData = saveData.buildings[index];
+        
+                // Create and initialize building
                 var createdBuilding = CreateBuilding(null, buildingData);
                 var buildingComponent = createdBuilding.GetComponent<Building>();
 
@@ -112,6 +118,8 @@ namespace Buildings
                 OccupyHexes(newTissue, buildingComponent);
 
                 Buildings.Add(buildingComponent);
+
+                LoadingProgressManager.LoadingMessage = $"Loading Buildings {index + 1}/{totalBuildings}";
                 yield return null;
             }
         }

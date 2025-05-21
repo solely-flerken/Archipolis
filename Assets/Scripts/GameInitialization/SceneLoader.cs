@@ -27,14 +27,20 @@ namespace GameInitialization
 
         private void Start()
         {
-            EventSystem.Instance.OnButtonClick += HandleButtonClick;
+            EventSystem.Instance.OnLoadGame += HandleLoadGame;
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
 
         private void OnDestroy()
         {
-            EventSystem.Instance.OnButtonClick -= HandleButtonClick;
+            EventSystem.Instance.OnLoadGame -= HandleLoadGame;
             SceneManager.sceneLoaded -= OnSceneLoaded;
+        }
+
+        private static void HandleLoadGame(string saveFile)
+        {
+            GameLoader.SaveFileName = saveFile;
+            SceneManager.LoadScene("Scenes/LoadingScene");
         }
 
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -52,40 +58,18 @@ namespace GameInitialization
             }
         }
 
-        private void HandleButtonClick(string buttonName)
-        {
-            switch (buttonName)
-            {
-                case "continue":
-                    SceneManager.LoadScene("Scenes/LoadingScene");
-                    break;
-                case "newGame":
-                    // Show UI for a new game
-                    break;
-                case "load":
-                    // Show UI for loading game
-                    break;
-                case "exit":
-                    // Exit game
-                    break;
-                default:
-                    // Unknown button
-                    break;
-            }
-        }
-
         private static IEnumerator LoadMainSceneInBackground()
         {
             var load = SceneManager.LoadSceneAsync("Scenes/MainScene", LoadSceneMode.Additive);
             load.allowSceneActivation = false;
-            
+
             while (!load.isDone || load.progress < 0.9f)
             {
                 yield return null;
             }
-            
+
             HideAllUI();
-            
+
             yield return GameLoader.LoadGame();
 
             var unload = SceneManager.UnloadSceneAsync("Scenes/LoadingScene");
@@ -93,15 +77,15 @@ namespace GameInitialization
             {
                 yield return null;
             }
-            
+
             // We need to update the camera after the scene has loaded
             CameraController.Camera = Camera.main;
 
             load.allowSceneActivation = true;
-            
+
             ShowInitialUI();
         }
-        
+
         private static void HideAllUI()
         {
             foreach (var userInterface in FindObjectsByType<UserInterfaceBase>(FindObjectsSortMode.None))
@@ -110,7 +94,7 @@ namespace GameInitialization
                 {
                     continue;
                 }
-                
+
                 userInterface.Hide();
             }
         }
