@@ -24,7 +24,7 @@ namespace Terrain
         [Header("Chunk Settings")] 
         [SerializeField] private int initialPoolSize = 10;
         [SerializeField] private int expandAmount = 1;
-        
+
         public MapGenerationParameters mapParameters = MapGenerationParameters.Default();
 
         private void Awake()
@@ -65,6 +65,8 @@ namespace Terrain
         {
             _chunkPool.ReleaseAllChunks();
 
+            #region Generate Height, Biome and Hex Map
+
             var positions = Util.GenerateHexPositions(mapParameters.gridRadius, HexRadius,
                 mapParameters.useCircularShape, mapParameters.circleFactor);
             var hexCount = positions.Count;
@@ -77,7 +79,7 @@ namespace Terrain
 
             var mapCenter = Util.CalculateMapCenter(worldPositions);
             var mapRadius = Util.CalculateMapRadius(worldPositions, mapCenter);
-            
+
             var random = new Random(mapParameters.seed);
             var octaveOffsets = new NativeArray<float2>(mapParameters.octaves, Allocator.TempJob);
             for (var i = 0; i < mapParameters.octaves; i++)
@@ -88,10 +90,69 @@ namespace Terrain
                 );
                 octaveOffsets[i] = offset;
             }
-            
+
             var generateTerrain =
-                new MapBiomeGenerator(mapParameters, worldPositions, octaveOffsets, biomeMap, heightMap, mapCenter, mapRadius);
+                new MapBiomeGenerator(mapParameters, worldPositions, octaveOffsets, biomeMap, heightMap, mapCenter,
+                    mapRadius);
             generateTerrain.Schedule(hexCount, 64).Complete();
+
+            // Initialize the hex map
+            var hexMap = new Dictionary<HexCoordinate, HexCellData>(hexCount);
+            for (var i = 0; i < hexCount; i++)
+            {
+                hexMap[positions[i].hexPos] = new HexCellData
+                {
+                    WorldPosition = positions[i].worldPos,
+                    Height = heightMap[i],
+                    Biome = biomeMap[i],
+                };
+            }
+
+            #endregion
+            
+            #region Map postprocessing
+
+            // TODO: Map postprocessing
+            var cellsToProcess = new Queue<HexCoordinate>();
+            var cellsProcessed = new HashSet<HexCoordinate>();
+            
+            var initialCell = hexMap.GetValueOrDefault(new HexCoordinate(0, 0));
+            var initialBiome = initialCell.Biome;
+            cellsToProcess.Enqueue(new HexCoordinate(0, 0));
+
+            while (cellsToProcess.Count > 0)
+            {
+                var current = cellsToProcess.Dequeue();
+                cellsProcessed.Add(current);
+                
+                var neighbors = hexMap.GetNeighbors(current);
+                neighbors.ForEach(neighbor =>
+                {
+                    var exists = hexMap.TryGetValue(neighbor, out var data);
+                    if (!exists) return;
+                    if (data.Biome != initialBiome) return;
+                
+                    data.Height = -1f;
+                    data.Biome = BiomeType.Unknown;
+                    hexMap[neighbor] = data;
+                    
+                    if(cellsProcessed.Contains(neighbor)) return;
+                    cellsToProcess.Enqueue(neighbor);
+                });
+            }
+            
+            // TODO: Refactor. Mesh generation uses biomeMap. Maybe change it to use the hex map instead.
+            for (var i = 0; i < hexCount; i++)
+            {
+                var coord = positions[i].hexPos;
+                var cell = hexMap[coord];
+                heightMap[i] = cell.Height;
+                biomeMap[i] = cell.Biome;
+            }
+
+            #endregion
+
+            #region Mesh generation
 
             // Prepare hex mesh template data
             var hexTemplate = Util.GenerateHexagonMesh(HexRadius, Color.white, IsFlatTopped);
@@ -157,16 +218,7 @@ namespace Terrain
                 finalColors.Dispose();
             }
 
-            var hexMap = new Dictionary<HexCoordinate, HexCellData>(hexCount);
-            for (var i = 0; i < hexCount; i++)
-            {
-                hexMap[positions[i].hexPos] = new HexCellData
-                {
-                    WorldPosition = positions[i].worldPos,
-                    Height = heightMap[i],
-                    Biome = biomeMap[i],
-                };
-            }
+            #endregion
 
             // Dispose global data
             worldPositions.Dispose();
