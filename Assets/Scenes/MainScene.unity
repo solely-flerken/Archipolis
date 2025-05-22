@@ -659,6 +659,8 @@ MonoBehaviour:
     hills: 0.75
     mountains: 0.8
     peaks: 1
+  postProcessingParameters:
+    minBiomeTissueSize: 4
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
