@@ -640,10 +640,10 @@ MonoBehaviour:
     useCircularShape: 0
     circleFactor: 1.5
     chunkSize: 32
-    seed: 482
+    seed: 509
     offset:
-      x: 2.08
-      y: -1.93
+      x: 0
+      y: 0
     octaves: 4
     scale: 400
     persistence: 0.5

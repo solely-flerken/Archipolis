@@ -1,3 +1,12 @@
-﻿fileFormatVersion: 2
+fileFormatVersion: 2
 guid: b026c45ea92446fc91cb2a6d33cda969
-timeCreated: 1744996310
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - chunkMaterial: {fileID: 2100000, guid: fd8f5aaa25a248078d14c12ed967d720, type: 2}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
