@@ -1,0 +1,25 @@
+﻿root = true
+
+# All files
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+# C# files
+[*.cs]
+dotnet_sort_system_directives_first = true # Place System.* usings at the top of the using block
+dotnet_separate_import_directive_groups = false # Add a blank line between different groups of using directives
+
+csharp_new_line_before_open_brace = all # Place opening braces on a new line for all types (methods, properties, classes, etc.)
+csharp_new_line_between_query_expression_clauses = true # Insert a newline between clauses in LINQ query expressions (e.g., from, where, select)
+
+csharp_preserve_single_line_blocks = true # Don't expand single-line code blocks to multiple lines (e.g., if (...) { ... } doesn't become multiline)
+csharp_preserve_single_line_statements = false # Expand single-line embedded statements (e.g., if (...) DoSomething(); becomes multiline)
+
+csharp_space_between_method_declaration_parameter_list_parentheses = false # Don't insert a space between method name and parameter list when declaring a method (e.g., `void MyMethod()` instead of `void MyMethod ()`)
+csharp_space_between_method_call_parameter_list_parentheses = false # Don't insert a space between method name and parameter list when calling a method (e.g., `MyMethod()` instead of `MyMethod ()`)
+csharp_space_after_cast = true # Add a space after a cast expression (e.g., `(int) value` instead of `(int)value`)
